@@ -1,0 +1,22 @@
+# setup.py generated files
+MANIFEST
+/*.egg-info/
+/dist/
+/build/
+
+# Python output files.
+__pycache__/
+*.pyo
+*.pyc
+
+# Output directory
+/images/
+
+# temparary files
+*.swp
+
+# other files.
+.exrc
+
+# OS Specific files
+.DS_Store
