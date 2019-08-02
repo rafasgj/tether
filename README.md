@@ -2,9 +2,6 @@
 
 Allows capturing images from cameras tethered to a computer USB.
 
-You must create a "images" directory in the current directory for it to
-work. I know it sucks, but, as of today, it is the way it is.
-
 ## Dependencies
 
 Tether needs Python 3, which is easily avaiable for Linux, easily installed

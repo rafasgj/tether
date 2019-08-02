@@ -11,6 +11,7 @@
 from camera import Camera
 from rawconverter import image_from_raw
 
+import os
 from PIL import Image
 
 import gi
@@ -53,7 +54,23 @@ if __name__ == "__main__":
                 camera_frame.camera_control.set_shutter_function(fn)
                 win.add(camera_frame)
                 win.show_all()
-                Gtk.main()
+
+                buttons = ((Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL),
+                           (Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+                title = "Select capture folder"
+                action = Gtk.FileChooserAction.SELECT_FOLDER
+                dialog = Gtk.FileChooserDialog(title=title, action=action,
+                                               transient_for=win)
+                for button in buttons:
+                    dialog.add_button(*button)
+                dialog.set_local_only(True)
+                dialog.set_create_folders(True)
+                dialog.set_current_folder(os.getcwd())
+                response = dialog.run()
+                if response == Gtk.ResponseType.OK:
+                    camera.capture_directory = dialog.get_filename()
+                    dialog.destroy()
+                    Gtk.main()
     except Exception as ex:
         print(ex)
         if camera is not None and camera.last_error is None:
