@@ -4,6 +4,7 @@ import os
 import os.path
 import gphoto2 as gp
 from .settings import CameraSettingModel
+from util.formatter import FilenameFormatter
 
 
 class Camera(object):
@@ -28,7 +29,12 @@ class Camera(object):
         self.port = port
         self.capture_directory = capture_directory
         self.__frame_grab = None
+        self.filename_formatter = FilenameFormatter()
         self.__init_cam()
+
+    def set_filename_format(self, format):
+        """Set the rule to name pictures taken."""
+        self.filename_formatter.format = format
 
     def __create_setting_model(self, var):
         model = self.get_setting_model(var)
@@ -116,7 +122,8 @@ class Camera(object):
         filename = img.name
         filepath = img.folder
         file = self.cam.file_get(filepath, filename, gp.GP_FILE_TYPE_NORMAL)
-        filename = os.path.join(self.capture_directory, filename)
+        filename = os.path.join(self.capture_directory,
+                                self.filename_formatter.filename(filename))
         gp.gp_file_save(file, filename)
         return filename
 
