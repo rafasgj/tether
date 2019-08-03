@@ -20,3 +20,13 @@ __pycache__/
 
 # OS Specific files
 .DS_Store
+
+# Camera files
+*.ORF
+*.orf
+*.NEF
+*.nef
+*.CR2
+*.cr2
+*.JPG
+*.jpg

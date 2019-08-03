@@ -3,8 +3,8 @@
 import os
 import os.path
 import gphoto2 as gp
-from .settings import CameraSettingModel
 from util.formatter import FilenameFormatter
+from util import OptionListModel
 
 
 class Camera(object):
@@ -39,7 +39,7 @@ class Camera(object):
     def __create_setting_model(self, var):
         model = self.get_setting_model(var)
         value = getattr(self, var)
-        return CameraSettingModel(model, value)
+        return OptionListModel(model, value)
 
     def __init_cam(self):
         try:

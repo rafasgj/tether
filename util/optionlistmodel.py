@@ -1,8 +1,8 @@
 """Camera settings models."""
 
 
-class CameraSettingModel(object):
-    """Creates a list model for controlling camera settings."""
+class OptionListModel(object):
+    """Creates a list model accessible trough indexes or values."""
 
     def __init__(self, model, value=0, index=-1):
         """Initialize the model object."""
@@ -22,12 +22,12 @@ class CameraSettingModel(object):
         assert index >= 0 and index < len(self.model)
         self.current = index
 
-    def increase_value(self):
+    def next(self):
         """Advance to next setting value."""
         if self.current < len(self.model) - 1:
             self.current += 1
 
-    def decrease_value(self):
+    def previous(self):
         """Advance to next setting value."""
         if self.current > 0:
             self.current -= 1

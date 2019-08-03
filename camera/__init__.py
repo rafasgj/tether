@@ -1,3 +1,5 @@
 """Initializes camera module."""
 
-from .camera import Camera  # noqa: F401
+# flake8: noqa
+
+from .camera import Camera
