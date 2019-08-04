@@ -105,6 +105,10 @@ class Camera(object):
             self.last_error = error.format(value, name)
             self.__set_config(name, bk)
 
+    def set_capture_directory(self, path):
+        """Set Capture Directory."""
+        self.capture_directory = path
+
     @property
     def capture_directory(self):
         """Retrieve the directory images will be captured to."""
