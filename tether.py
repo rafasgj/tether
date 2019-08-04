@@ -10,6 +10,7 @@
 
 from camera import Camera
 from rawconverter import image_from_raw
+from util.formatter import FilenameFormatter
 
 import os
 import PIL
@@ -20,10 +21,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf    # noqa: E402
 from ui.functions import button_with_icon_text    # noqa: E402
 from ui.cameracontrolbox import CameraControlBox  # noqa: E402
-
+from ui.filenametemplatedialog import FilenameTemplateDialog  # noqa: E402
 
 # Hold the last image captured
 last_image = None
+formatter = FilenameFormatter()
 
 
 def picture_taken(camera, filename):
@@ -64,11 +66,17 @@ def create_frame(size=(640, 480)):
     sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
     butns = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
     button = button_with_icon_text("insert-text", "Rename")
-    button.connect('clicked', lambda button: print("Rename Clicked."))
+    button.connect('clicked', update_formatter)
     butns.pack_start(button, False, False, 0)
-    button = button_with_icon_text("folder", "Directory")
-    button.connect('clicked', change_target_directory)
-    butns.pack_start(button, False, False, 0)
+    action = Gtk.FileChooserAction.SELECT_FOLDER
+    button = Gtk.FileChooserButton(title="Directory", action=action)
+    button.connect('file_set', camera.set_capture_directory)
+    button.set_create_folders(True)
+    button.set_local_only(True)
+    folder = camera.capture_directory
+    folder = folder if folder else os.getcwd()
+    button.set_current_folder(folder)
+    butns.pack_end(button, False, False, 0)
     sub.pack_start(butns, False, False, 0)
     camera_control = CameraControlBox(camera, camera.grab_frame)
     sub.pack_start(camera_control, False, False, 0)
@@ -80,6 +88,16 @@ def create_frame(size=(640, 480)):
     main.pack_start(sub, False, False, 0)
     frame.add(main)
     return frame
+
+
+def update_formatter(self, *args):
+    """Update filename formatter."""
+    dialog = FilenameTemplateDialog(format=camera.filename_formatter.format,
+                                    transient_for=None)
+    if dialog.run() == Gtk.ResponseType.OK:
+        camera.filename_formatter.add_keys(dialog.user_defined)
+        camera.filename_formatter.format = dialog.filename_template
+    dialog.destroy()
 
 
 def get_image_pixbuf(image):
@@ -164,11 +182,9 @@ if __name__ == "__main__":
                 win = Gtk.Window()
                 win.set_title("Picture Maker")
                 win.connect("destroy", Gtk.main_quit)
-
                 win.add(create_frame())
                 win.show_all()
-                if change_target_directory():
-                    Gtk.main()
+                Gtk.main()
     except Exception as ex:
         import traceback
         print(traceback.format_exc())

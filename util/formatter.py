@@ -9,7 +9,6 @@ class FilenameFormatter:
     Define an object that transform filenames using metadata.
 
     Filename creation rules:
-        {session} - The session name.
         {text} - A custom text name.
         {YYYY} - four digit year.
         {YY} - two digit year.
@@ -25,17 +24,17 @@ class FilenameFormatter:
 
         A user may add new keys, like:
             {camera} - camera serial number.
-            {lens} - lens serial number (not yet supported).
+            {lens} - lens serial number.
+            {session} - the name of the current session.
     """
 
-    def __init__(self, format="IMG_{seq:04}.{EXT}",
-                 session="", text="", initial=0):
+    def __init__(self, format="IMG_{seq:04}.{EXT}", *args, **kwargs):
         """Initialize filename formater."""
         self.format = format
-        self.counter = initial
+        self.counter = kwargs.get('initial', 0)
+        self.date = kwargs.get('date', datetime.datetime.now())
         self.format_set = {
-            "session": session,
-            "text": text,
+            "custom_text": kwargs.get('text', ''),
             "seq": 0,
             "filename": "",
             "ext": "",
@@ -44,14 +43,13 @@ class FilenameFormatter:
         self.__filldate()
 
     def __filldate(self):
-        today = datetime.datetime.now()
         date = {
-            "YYYY": today.strftime("%Y"),
-            "YY":  today.strftime("%y"),
-            "MM":  today.strftime("%m"),
-            "mon":  today.strftime("%b"),
-            "month":  today.strftime("%B"),
-            "DD": today.strftime("%d"),
+            "YYYY": self.date.strftime("%Y"),
+            "YY":  self.date.strftime("%y"),
+            "MM":  self.date.strftime("%m"),
+            "mon":  self.date.strftime("%b"),
+            "month":  self.date.strftime("%B"),
+            "DD": self.date.strftime("%d"),
         }
         self.format_set.update(date)
 
@@ -60,6 +58,10 @@ class FilenameFormatter:
         if value is None or str(value) is None:
             raise Exception("Invalid value for filename key.")
         self.format_set[key] = value
+
+    def add_keys(self, keys):
+        """Add several key-value pairs to the filename formatter."""
+        self.format_set.update(keys)
 
     def filename(self, original):
         """Format the filename given the current rules."""
@@ -72,3 +74,8 @@ class FilenameFormatter:
         self.set('filename', os.path.basename(filename))
         self.set('original', os.path.basename(original))
         return self.format.format(**self.format_set)
+
+    @property
+    def keys(self):
+        """Query the currently stored keys in the formatter."""
+        return self.format_set.keys()
