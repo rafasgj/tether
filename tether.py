@@ -37,6 +37,7 @@ def picture_taken(camera, filename):
     except Exception as ex:
         # If it fails, try RAW.
         last_image = image_from_raw(filename)
+    win.queue_draw()
 
 
 def set_application_theme():
