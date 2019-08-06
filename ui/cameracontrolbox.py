@@ -29,12 +29,15 @@ class CameraControlBox(Gtk.Box):
     def __create_camera_settings_box(self, camera):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box.set_homogeneous(False)
-        shutter = OptionSelector("Shutter", camera.shutterspeed_model)
-        aperture = OptionSelector("Aperture", camera.aperture_model)
-        iso = OptionSelector("ISO", camera.iso_model)
-        box.pack_start(shutter, False, False, 0)
-        box.pack_start(aperture, False, False, 0)
-        box.pack_start(iso, False, False, 0)
+        if camera.shutterspeed_model:
+            shutter = OptionSelector("Shutter", camera.shutterspeed_model)
+            box.pack_start(shutter, False, False, 0)
+        if camera.aperture_model:
+            aperture = OptionSelector("Aperture", camera.aperture_model)
+            box.pack_start(aperture, False, False, 0)
+        if camera.iso_model:
+            iso = OptionSelector("ISO", camera.iso_model)
+            box.pack_start(iso, False, False, 0)
         return box
 
     def __create_combo_settings(self):
@@ -48,6 +51,9 @@ class CameraControlBox(Gtk.Box):
                 return False
 
         def create_combo(label, name):
+            model = self.camera.get_setting_model(name)
+            if model is None:
+                return None
             vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1)
             # TODO: this 3-line hack computes the alleged max label size.
             text = Gtk.Label(label=label)
@@ -56,7 +62,6 @@ class CameraControlBox(Gtk.Box):
             sz = sz.size_request()
             text.set_size_request(sz.width, sz.height)
             vbox.pack_start(text, False, False, 0)
-            model = self.camera.get_setting_model(name)
             cb = ListComboBox(model)
             setattr(self, name, cb)
             cb.get_model().foreach(set_value_if, name)
@@ -66,10 +71,12 @@ class CameraControlBox(Gtk.Box):
             return vbox
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        box.pack_start(create_combo("White\nBalance", "whitebalance"),
-                       False, False, 0)
-        box.pack_start(create_combo("Image\nFormat", "imageformat",),
-                       False, False, 0)
+        combo = create_combo("White\nBalance", "whitebalance")
+        if combo is not None:
+            box.pack_start(combo, False, False, 0)
+        combo = create_combo("Image\nFormat", "imageformat")
+        if combo is not None:
+            box.pack_start(combo, False, False, 0)
         return box
 
     def __create_camera_properties_box(self, model, lens):

@@ -1,13 +1,5 @@
 """Use a camera tethered to the device."""
 
-# TODO:
-# whitebalance icons and UI
-# focusmode UI
-# drivemode icons and UI
-# imageformat setting UI
-#
-# Manual focus drive\
-
 from camera import Camera
 from rawconverter import image_from_raw
 from util.formatter import FilenameFormatter
@@ -165,6 +157,7 @@ def change_target_directory(*args):
 
 
 if __name__ == "__main__":
+    import sys
     camera = None
     try:
         cameras = [p for (c, p) in Camera.autodetect() if "PTP mode" not in c]
@@ -172,7 +165,10 @@ if __name__ == "__main__":
             print("No camera found.")
         else:
             port = cameras[0]
-            camera = Camera(port, "images")
+            camera = Camera(port, capture_directory="images")
+            if not camera.can_capture_image():
+                print("Camera cannot capture images with GPhoto2.")
+                sys.exit(1)
             camera.on_frame_grab(picture_taken)
             if camera.last_error:
                 print("Error initializing camera.")
