@@ -1,6 +1,9 @@
 # Tether
 
-Allows capturing images from cameras tethered to a computer USB.
+A GUI to capture images from cameras tethered to a computer USB.
+
+If something seem to be wrong, it probably is, but check [ISSUES.md](ISSUES.md)
+before reporting [on Github](https://github.com/rafasgj/tether/issues).
 
 ## Dependencies
 
@@ -31,3 +34,13 @@ Unfortunatelly, I don't use Windows and have no idea on how to install.
 If your camera provides RAW files, you will want to use it to capture the
 images, and this will require that you have LibRaw installed. Anything, from
 version 0.18 will do, but use the most recent available.
+
+
+### Indirect Dependencies
+
+This software has some dependencies that might help on its use, but are not
+mandatory. These dependencies often show as optional dependencies of libraries
+and components used.
+
+* Gnome Virtual File System - gvfs
+* Udisks2
