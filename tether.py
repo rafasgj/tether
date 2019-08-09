@@ -165,7 +165,7 @@ if __name__ == "__main__":
             print("No camera found.")
         else:
             port = cameras[0]
-            camera = Camera(port, capture_directory="images")
+            camera = Camera(port)
             if not camera.can_capture_image():
                 print("Camera cannot capture images with GPhoto2.")
                 sys.exit(1)
