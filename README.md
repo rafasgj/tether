@@ -7,9 +7,19 @@ before reporting [on Github](https://github.com/rafasgj/tether/issues).
 
 ## Dependencies
 
-Tether needs Python 3, which is easily avaiable for Linux, easily installed
-on Windows, and might require the use of a package manager like Homebrew if
-you have an older version of macOS (like High Sierra).
+### Libgphoto2
+
+Gphoto2 is composed of a command-line utility and a shared library with
+functions that allow controlling a camera connected to the computer. It
+must be installed, before the Python modules. Use the latest available
+for your package manager.
+
+### Python Modules
+
+Tether needs **Python 3**, which is easily avaiable for Linux, easily
+installed on Windows, and might require the use of a package manager like
+[Homebrew](https://brew.sh) if you have an older version of macOS
+(like High Sierra).
 
 Pure Python dependencies may be installed with PIP, by issuing
 
@@ -32,15 +42,15 @@ Unfortunatelly, I don't use Windows and have no idea on how to install.
 ### LibRaw
 
 If your camera provides RAW files, you will want to use it to capture the
-images, and this will require that you have LibRaw installed. Anything, from
-version 0.18 will do, but use the most recent available.
-
+images, and this will require that you have LibRaw installed. Anything,
+from version 0.18 will do, but use the most recent available.
 
 ### Indirect Dependencies
 
-This software has some dependencies that might help on its use, but are not
-mandatory. These dependencies often show as optional dependencies of libraries
-and components used.
+This software has some dependencies that might help on its use, but are
+not mandatory. These dependencies often show as optional dependencies of
+libraries and components used.
 
 * Gnome Virtual File System - gvfs
 * Udisks2
+
