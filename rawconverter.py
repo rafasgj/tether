@@ -19,3 +19,12 @@ def image_from_raw(filename, params=__params):
     with rawpy.imread(filename) as raw:
         rgb = raw.postprocess(params)
         return Image.fromarray(rgb, 'RGB')
+
+
+if __name__ == "__main__":
+    import sys
+    import os.path
+
+    filename, ext = os.path.splitext(os.path.basename(sys.argv[1]))
+    img = image_from_raw(sys.argv[1])
+    img.save("{}.jpg".format(filename))
