@@ -21,15 +21,16 @@ The packages that need to be installed are:
 * pygobject
 * libgphoto2
 * libraw
+* libmagic
 
 To install all packages run
 
 ```sh
-$ brew install gtk+3 pygobject libgphoto2 libraw
+$ brew install gtk+3 pygobject libgphoto2 libraw libmagic
 ```
 
 ### Other package managers
 
 If you use other package managers like mac ports or Fink, you might
 contribute to this project by writing instructions on installing the
-dependencies. 
+dependencies.

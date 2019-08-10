@@ -8,6 +8,8 @@ import os
 import PIL
 import io
 
+from magic import Magic
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf    # noqa: E402
@@ -17,17 +19,19 @@ from ui.filenametemplatedialog import FilenameTemplateDialog  # noqa: E402
 
 # Hold the last image captured
 last_image = None
+
 formatter = FilenameFormatter()
+mime = Magic(mime=True)
 
 
 def picture_taken(camera, filename):
     """Handle new frame signal."""
     global last_image
-    try:
-        # Try JPEG or TIFF
+    pil = ('image/jpeg', 'image/tiff', 'image/gif', 'image/png')
+    mime_type = mime.from_file(filename)
+    if mime_type in pil:
         last_image = PIL.Image.open(filename)
-    except Exception as ex:
-        # If it fails, try RAW.
+    else:
         last_image = image_from_raw(filename)
     win.queue_draw()
 
