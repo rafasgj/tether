@@ -37,8 +37,7 @@ As Tether uses GTK+ 3, some Python dependencies must be installed and
 cannot be installed using PIP. For Linux, most distributions have
 PyGObject in their main package repositories. Under macOS, you should
 use Homebrew to install it. Unfortunatelly, I don't use Windows and
-have no idea on how to install
-GTK+ on it.
+have no idea on how to install GTK+ on it.
 
 ### LibRaw
 
