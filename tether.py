@@ -106,12 +106,11 @@ def get_image_pixbuf(image):
             loader.write(data.getvalue())
             data = loader.get_pixbuf()
             loader.close()
-            img = Gtk.Image.new_from_pixbuf(data)
     elif isinstance(image, Gtk.Image):
-        img = image
+        data = image.get_pixbuf()
     else:
         raise Exception("Internal Error: Invalid image object.")
-    return img.get_pixbuf()
+    return data
 
 
 def update_image_ui(drawing_area, cairo_context):
