@@ -1,12 +1,13 @@
 """Use a camera tethered to the device."""
 
 from camera import Camera
-from rawconverter import image_from_raw
 from util.formatter import FilenameFormatter
 
 import os
-import PIL
+from PIL import Image
 import io
+
+from phexif import ExifTool
 
 from magic import Magic
 
@@ -22,6 +23,8 @@ last_image = None
 
 formatter = FilenameFormatter()
 mime = Magic(mime=True)
+exif = ExifTool()
+exif.start()
 
 
 def picture_taken(camera, filename):
@@ -30,9 +33,10 @@ def picture_taken(camera, filename):
     pil = ('image/jpeg', 'image/tiff', 'image/gif', 'image/png')
     mime_type = mime.from_file(filename)
     if mime_type in pil:
-        last_image = PIL.Image.open(filename)
+        last_image = Image.open(filename)
     else:
-        last_image = image_from_raw(filename)
+        reader = io.BytesIO(exif.get_image_preview(filename))
+        last_image = Image.open(reader)
     win.queue_draw()
 
 
@@ -99,7 +103,7 @@ def update_formatter(self, *args):
 
 def get_image_pixbuf(image):
     """Given the image, get its contents as a GdkPixbuf."""
-    if isinstance(image, PIL.Image.Image):
+    if isinstance(image, Image.Image):
         with io.BytesIO() as data:
             image.save(data, "jpeg")
             loader = GdkPixbuf.PixbufLoader.new_with_type("jpeg")

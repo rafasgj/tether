@@ -51,6 +51,13 @@ It is used to identify which type of image is to be captured from
 camera and displayed. You probably have it installed on your Linux
 machine, you might need to install it under other operating systems.
 
+### ExifTool
+
+Phil Harvey's ExifTool is an amazing tool to deal with image EXIF
+metadata, and is used to extract embedded images from RAW files.
+This is much faster than applying a demosaic algorithm to the RAW
+files, and provide a similar view than the camera LCD monitor.
+
 ### Indirect Dependencies
 
 This software has some dependencies that might help on its use, but are
