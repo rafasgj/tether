@@ -71,7 +71,7 @@ def create_frame(size=(640, 480)):
 
     sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
     butns = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-    button = button_with_icon_text("insert-text", "Rename")
+    button = button_with_icon_text("insert-text", "Naming Rule")
     button.connect('clicked', update_formatter)
     butns.pack_start(button, False, False, 0)
     action = Gtk.FileChooserAction.SELECT_FOLDER
