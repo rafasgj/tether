@@ -76,7 +76,8 @@ def create_frame(size=(640, 480)):
     butns.pack_start(button, False, False, 0)
     action = Gtk.FileChooserAction.SELECT_FOLDER
     button = Gtk.FileChooserButton(title="Directory", action=action)
-    button.connect('file_set', camera.set_capture_directory)
+    button.connect('file_set',
+                   lambda b: camera.set_capture_directory(b.get_filename()))
     button.set_create_folders(True)
     button.set_local_only(True)
     folder = camera.capture_directory
