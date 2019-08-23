@@ -32,11 +32,16 @@ def picture_taken(camera, filename):
     global last_image
     pil = ('image/jpeg', 'image/tiff', 'image/gif', 'image/png')
     mime_type = mime.from_file(filename)
+    metadata = exif.get_metadata(filename)[0]
+    key = 'EXIF:Orientation'
+    rotation = [0, 0, 0, 180, 0, 0, -90, 0, 90]
+    orientation = rotation[int(metadata[key])] if key in metadata else 0
     if mime_type in pil:
         last_image = Image.open(filename)
     else:
         reader = io.BytesIO(exif.get_image_preview(filename))
         last_image = Image.open(reader)
+    last_image = last_image.rotate(orientation, expand=True)
     win.queue_draw()
 
 
