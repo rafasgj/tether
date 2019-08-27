@@ -45,17 +45,6 @@ def picture_taken(camera, filename):
     win.queue_draw()
 
 
-def set_application_theme():
-    """Load application theme CSS."""
-    css = b''
-    css_provider = Gtk.CssProvider()
-    css_provider.load_from_data(css)
-    context = Gtk.StyleContext()
-    screen = Gdk.Screen.get_default()
-    priority = Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    context.add_provider_for_screen(screen, css_provider, priority)
-
-
 def create_frame(size=(640, 480)):
     """Create the main window frame."""
     frame = Gtk.Frame()
@@ -146,30 +135,55 @@ def update_image_ui(drawing_area, cairo_context):
     return False
 
 
-def change_target_directory(*args):
-    """Ask user for the new capture directory."""
+def display_select_folder_dialog(title, parent=None):
+    """Create a dialog to select a folder."""
     buttons = ((Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL),
                (Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-    title = "Select capture folder"
     action = Gtk.FileChooserAction.SELECT_FOLDER
     dialog = Gtk.FileChooserDialog(title=title, action=action,
-                                   transient_for=win)
+                                   transient_for=parent)
     for button in buttons:
         dialog.add_button(*button)
     dialog.set_local_only(True)
     dialog.set_create_folders(True)
-    dialog.set_current_folder(os.getcwd())
-    response = dialog.run()
-    directory = dialog.get_filename()
-    dialog.destroy()
-    if response == Gtk.ResponseType.OK:
+    dialog.set_current_folder(camera.capture_directory)
+    try:
+        if dialog.run() == Gtk.ResponseType.OK:
+            return dialog.get_filename()
+        else:
+            return None
+    finally:
+        dialog.destroy()
+
+
+def change_target_directory(*args):
+    """Ask user for the new capture directory."""
+    directory = display_select_folder_dialog("Select capture folder", win)
+    if directory:
         camera.capture_directory = directory
-        return True
-    else:
-        return False
 
 
 if __name__ == "__main__":
+    def set_application_theme():
+        """Load application theme CSS."""
+        css = b''
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_data(css)
+        context = Gtk.StyleContext()
+        screen = Gdk.Screen.get_default()
+        priority = Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        context.add_provider_for_screen(screen, css_provider, priority)
+
+    def start_gui():
+        """Start graphical interface."""
+        set_application_theme()
+        win = Gtk.Window()
+        win.set_title("Picture Maker")
+        win.connect("destroy", Gtk.main_quit)
+        win.add(create_frame())
+        win.show_all()
+        return win
+
     import sys
     camera = None
     try:
@@ -188,12 +202,7 @@ if __name__ == "__main__":
                 print(camera.last_error)
                 camera.reset_error()
             else:
-                set_application_theme()
-                win = Gtk.Window()
-                win.set_title("Picture Maker")
-                win.connect("destroy", Gtk.main_quit)
-                win.add(create_frame())
-                win.show_all()
+                win = start_gui()
                 Gtk.main()
     except Exception as ex:
         import traceback
