@@ -193,3 +193,10 @@ class Camera(object):
             return abilities.operations & flags
         else:
             return None
+
+
+if __name__ == "__main__":
+    ports = [p for (c, p) in Camera.autodetect() if "PTP mode" not in c]
+    cam = Camera(ports[0])
+    print(cam.get_setting_model('drivemode'))
+    print(cam.drivemode)
