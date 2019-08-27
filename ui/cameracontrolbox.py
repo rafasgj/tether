@@ -3,6 +3,7 @@
 from gi.repository import Gtk
 from .optionselector import OptionSelector
 from .listcombobox import ListComboBox
+from .functions import label_with_character_size
 
 
 class CameraControlBox(Gtk.Box):
@@ -14,8 +15,12 @@ class CameraControlBox(Gtk.Box):
                          spacing=10)
         self.set_homogeneous(False)
         self.camera = camera
-        # Shutter Button
-        self.pack_start(self.__create_combo_settings(), False, False, 0)
+        # Combo settings
+        cbs = [("White\nBalance", "whitebalance"),
+               ("Image\nFormat", "imageformat")]
+        self.pack_start(self.__create_combo_settings(cbs), False, False, 0)
+        cbs = [("Drive Mode", "drivemode")]
+        self.pack_start(self.__create_combo_settings(cbs), False, False, 0)
         # Camera Settings box
         internal = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         internal.set_homogeneous(False)
@@ -27,7 +32,7 @@ class CameraControlBox(Gtk.Box):
                             camera.lensname), False, False, 0)
 
     def __create_camera_settings_box(self, camera):
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         box.set_homogeneous(False)
         if camera.shutterspeed_model:
             shutter = OptionSelector("Shutter", camera.shutterspeed_model)
@@ -40,7 +45,7 @@ class CameraControlBox(Gtk.Box):
             box.pack_start(iso, False, False, 0)
         return box
 
-    def __create_combo_settings(self):
+    def __create_combo_settings(self, settings):
         """Create UI for Wite Balance and Image Format."""
         def set_value_if(model, _, iter, name):
             value = getattr(self.camera, name)
@@ -56,11 +61,8 @@ class CameraControlBox(Gtk.Box):
                 return None
             vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1)
             # TODO: this 3-line hack computes the alleged max label size.
-            text = Gtk.Label(label=label)
-            sz = Gtk.Label(label="WWWWWWW")
-            sz.show()
-            sz = sz.size_request()
-            text.set_size_request(sz.width, sz.height)
+            text = label_with_character_size(7)
+            text.set_text(label)
             vbox.pack_start(text, False, False, 0)
             cb = ListComboBox(model)
             setattr(self, name, cb)
@@ -71,16 +73,14 @@ class CameraControlBox(Gtk.Box):
             return vbox
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        combo = create_combo("White\nBalance", "whitebalance")
-        if combo is not None:
-            box.pack_start(combo, False, False, 0)
-        combo = create_combo("Image\nFormat", "imageformat")
-        if combo is not None:
-            box.pack_start(combo, False, False, 0)
+        for (title, cap) in settings:
+            combo = create_combo(title, cap)
+            if combo is not None:
+                box.pack_start(combo, False, False, 0)
         return box
 
     def __create_camera_properties_box(self, model, lens):
-        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
         box.set_homogeneous(True)
         camera_model = Gtk.Label(label=model)
         lens_model = Gtk.Label(label=lens)
