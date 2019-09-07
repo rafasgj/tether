@@ -2,3 +2,4 @@ gphoto2 >= 2.0.0
 rawpy >= 0.13.1
 pillow >= 6.1.0
 python-magic >= 0.4.15
+pygobject >= 3.32.2

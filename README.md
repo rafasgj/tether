@@ -13,7 +13,9 @@ If something seem to be wrong, it probably is, but check
 Gphoto2 is composed of a command-line utility and a shared library with
 functions that allow controlling a camera connected to the computer. It
 must be installed, before the Python modules. Use the latest available
-for your package manager.
+for your package manager. You will also need the development files for
+libgphoto2 (libgphoto2-devel or libgphoto2-dev) and the Python
+header files available (from package python3-devel or python3-dev).
 
 ### Python Modules
 
@@ -33,11 +35,20 @@ operating system and/or installation.
 
 ### GTK+ 3
 
-As Tether uses GTK+ 3, some Python dependencies must be installed and
-cannot be installed using PIP. For Linux, most distributions have
-PyGObject in their main package repositories. Under macOS, you should
-use Homebrew to install it. Unfortunatelly, I don't use Windows and
-have no idea on how to install GTK+ on it.
+Under Python, GTK+ 3 implementations uses GObject instrospection, and
+it must be available before installyng pygobject.
+
+For Linux, most distributions have PyGObject in their main package
+repositories, but I recommend installing the dependencies through the
+package manager, and pygobject through PIP.
+
+The following development packages are required to install PyGObject:
+	* cairo
+	* gobject-introspection
+	* cairo-gobject
+
+Under macOS, you should use Homebrew to install it. Unfortunatelly,
+I don't use Windows and have no idea on how to install GTK+ on it.
 
 ### LibRaw
 
