@@ -5,9 +5,10 @@ linux_dependencies() {
 	case $NAME in
 		"Fedora")
 			gphoto="libgphoto2 libgphoto2-devel python3-devel"
-			gtk="cairo-devel gobject-introspection-devel"
+			gtk="cairo-devel cairo-gobject-devel"
+			gobject="gobject-introspection-devel"
 			exif="perl-Image-ExifTool"
-			dnf install $gphoto $gtk $exif
+			dnf install $gphoto $gtk $exif $gobject
 		;;
 	esac  # is ridiculous ;-)
 }
