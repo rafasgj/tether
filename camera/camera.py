@@ -11,11 +11,12 @@ class Camera(object):
     """Abstract the usage for GPhoto2 with higher level commands."""
 
     # TODO: autopoweroff (TEXT)
-    config_properties = ['focusmode', 'drivemode', 'imageformat',
-                         'shutterspeed', 'aperture', 'iso', 'meteringmode',
-                         'whitebalance']
-    readonly_properties = ['shuttercounter', 'lensname', 'serialnumber',
-                           'batterylevel']
+    properties = {
+        "config": ['focusmode', 'drivemode', 'imageformat', 'meteringmode',
+                   'shutterspeed', 'aperture', 'iso', 'whitebalance'],
+        "readonly": ['shuttercounter', 'lensname', 'serialnumber',
+                     'batterylevel']
+    }
 
     @staticmethod
     def autodetect():
@@ -93,7 +94,7 @@ class Camera(object):
         self.__restart()
         try:
             result = self.config.get_child_by_name(name)
-        except Exception as ex:
+        except Exception:
             result = None
         return result
 
@@ -111,7 +112,7 @@ class Camera(object):
                 self.cam.set_config(self.config)
             else:
                 self.last_error = "Invalid configuration: {}".format(name)
-        except Exception as ex:
+        except Exception:
             error = "Invalid config value '{}' for '{}'."
             self.last_error = error.format(value, name)
             self.__set_config(name, bk)
@@ -149,14 +150,15 @@ class Camera(object):
 
     def __setattr__(self, name, value):
         """Overide 'setters' to easily deal with camera properties."""
-        if name in Camera.config_properties:
+        if name in Camera.properties['config']:
             self.__set_config(name, value)
         else:
             super().__setattr__(name, value)
 
     def __getattribute__(self, name):
         """Overide 'getters' to easily deal with camera properties."""
-        if name in Camera.config_properties + Camera.readonly_properties:
+        props = Camera.properties['config'] + Camera.properties['readonly']
+        if name in props:
             return self.__get_config(name)
         else:
             return super().__getattribute__(name)
