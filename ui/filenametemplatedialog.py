@@ -95,10 +95,16 @@ class FilenameTemplateDialog(Gtk.Dialog):
         self.entries[name] = entry.get_text()
 
     def __add_text(self, button, entry, text):
-        # TODO: Replace selected text.
-        # TODO: Position cursor at the end of the text
-        new = entry.get_text()
-        entry.set_text(new + text)
+        old_text = entry.get_text()
+        bounds = entry.get_selection_bounds()
+        if bounds:
+            start, end = bounds
+        else:
+            start = entry.get_position()
+            end = start
+
+        entry.set_text(old_text[:start] + text + old_text[end:])
+        entry.set_position(start + len(text))
         entry.grab_focus_without_selecting()
         return False
 
