@@ -20,7 +20,8 @@ class FilenameTemplateDialog(Gtk.Dialog):
 
     def __init__(self, format="", *args, **kwargs):
         """Initialize the dialog."""
-        Gtk.Dialog.__init__(self, *args, **kwargs)
+        Gtk.Dialog.__init__(self, *args, **{k: kwargs[k] for k in kwargs
+                                            if k not in ['custom_strings']})
         self.set_size_request(*(450, 300))
         self.add_buttons(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -72,6 +73,11 @@ class FilenameTemplateDialog(Gtk.Dialog):
         )
         flowbox = self.__create_flow_box("Filename", file_strings)
         self.box.pack_start(flowbox, False, False, 0)
+        #
+        custom_strings = kwargs.get('custom_strings', None)
+        if custom_strings is not None:
+            flowbox = self.__create_flow_box("Custom", custom_strings)
+            self.box.pack_start(flowbox, False, False, 0)
         #
         self.show_all()
 
@@ -146,7 +152,8 @@ if __name__ == "__main__":
     )
     dialog = Gtk.Window()
     x = FilenameTemplateDialog(title="Create Filename Template",
-                               transient_for=dialog)
+                               transient_for=dialog,
+                               custom_strings=custom_list)
     ok = x.run()
     formatter = FilenameFormatter(format=x.filename_template)
     formatter.add_keys(x.user_defined)
