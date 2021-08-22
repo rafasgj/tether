@@ -2,7 +2,7 @@
 
 A GUI to capture images from cameras tethered to a computer USB.
 
-If something seem to be wrong, it probably is, but check
+If something seems to be wrong, it probably is, but check
 [ISSUES.md](ISSUES.md) before reporting
 [on Github](https://github.com/rafasgj/tether/issues).
 
@@ -19,15 +19,15 @@ header files available (from package python3-devel or python3-dev).
 
 ### Python Modules
 
-Tether needs **Python 3**, which is easily avaiable for Linux, easily
-installed on Windows, and might require the use of a package manager
-like [Homebrew](https://brew.sh) if you have an older version of macOS
-(like High Sierra).
+Tether needs **Python 3**, which is available on almost every Linux
+distibution, can be easily installed on Windows, and might require the
+use of a package manager like [Homebrew](https://brew.sh) if you have
+an older version of macOS (like High Sierra).
 
 Pure Python dependencies may be installed with PIP, by issuing
 
 ```sh
-python3 -m pip install -U -r requriments.txt
+python3 -m pip install -U -r requirements.txt
 ```
 
 You might need to change 'python3' to 'python' depending on your
