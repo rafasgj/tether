@@ -20,6 +20,7 @@ from ui.filenametemplatedialog import FilenameTemplateDialog  # noqa: E402
 
 # Hold the last image captured
 last_image = None
+img_win = None
 
 formatter = FilenameFormatter()
 mime = Magic(mime=True)
@@ -42,21 +43,16 @@ def picture_taken(camera, filename):
         reader = io.BytesIO(exif.get_image_preview(filename))
         last_image = Image.open(reader)
     last_image = last_image.rotate(orientation, expand=True)
-    win.queue_draw()
+    img_win.queue_draw()
 
 
-def create_frame(size=(640, 480)):
+def create_frame(size=(640, 80)):
     """Create the main window frame."""
     frame = Gtk.Frame()
     frame.set_size_request(*size)
     main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
     main.set_homogeneous(False)
     main.set_border_width(10)
-    img_ui = Gtk.DrawingArea()
-    img_ui.set_hexpand(True)
-    img_ui.set_vexpand(True)
-    img_ui.connect('draw', update_image_ui)
-    main.pack_start(img_ui, True, True, 0)
 
     sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
     butns = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -112,9 +108,27 @@ def get_image_pixbuf(image):
     return data
 
 
+def create_image_window():
+    global img_win
+    screen = Gdk.Screen.get_default()
+    img_win = Gtk.Window()
+    img_win.connect("destroy", Gtk.main_quit)
+    img_win.set_position(Gtk.WindowPosition.CENTER)
+    img_win.set_title("Picture Maker")
+    img_ui = Gtk.DrawingArea()
+    img_ui.set_hexpand(True)
+    img_ui.set_vexpand(True)
+    img_ui.connect('draw', update_image_ui)
+    img_win.set_size_request(int(screen.width() * 0.75), int(screen.height() * 0.75))
+    img_win.add(img_ui)
+    img_win.move(0, 0)
+    img_win.show_all()
+
+
 def update_image_ui(drawing_area, cairo_context):
     """Update image displayed."""
     if last_image is not None:
+        img_win.activate()
         data = get_image_pixbuf(last_image)
         iw, ih = data.get_width(), data.get_height()
         w = drawing_area.get_allocated_width()
@@ -177,11 +191,16 @@ if __name__ == "__main__":
     def start_gui():
         """Start graphical interface."""
         set_application_theme()
+        create_image_window()
         win = Gtk.Window()
-        win.set_title("Picture Maker")
+        win.set_decorated(False)
+        screen = Gdk.Screen.get_default()
+        win.move(screen.width(), screen.height())
         win.connect("destroy", Gtk.main_quit)
         win.add(create_frame())
         win.show_all()
+        win.set_keep_above(True)
+
         return win
 
     import sys
