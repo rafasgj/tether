@@ -1,8 +1,7 @@
 """Create a filename template dialog."""
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk  # noqa: F401
+import gi; gi.require_version('Gtk', '3.0')  # noqa: E702
+from gi.repository import Gtk
 
 """
 Define an object that transform filenames using metadata.

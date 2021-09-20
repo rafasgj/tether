@@ -34,15 +34,14 @@ class CameraControlBox(Gtk.Box):
     def __create_camera_settings_box(self, camera):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         box.set_homogeneous(False)
-        if camera.shutterspeed_model:
-            shutter = OptionSelector("Shutter", camera.shutterspeed_model)
-            box.pack_start(shutter, False, False, 0)
-        if camera.aperture_model:
-            aperture = OptionSelector("Aperture", camera.aperture_model)
-            box.pack_start(aperture, False, False, 0)
-        if camera.iso_model:
-            iso = OptionSelector("ISO", camera.iso_model)
-            box.pack_start(iso, False, False, 0)
+        models = (
+            ("Shutter", "shutter"),
+            ("Aperture", "aperture"),
+            ("ISO", "iso"),
+        )
+        for title, model in models:
+            selector = OptionSelector(title, camera.models.get(model))
+            box.pack_start(selector, False, False, 0)
         return box
 
     def __create_combo_settings(self, settings):
@@ -55,8 +54,7 @@ class CameraControlBox(Gtk.Box):
             else:
                 return False
 
-        def create_combo(label, name):
-            model = self.camera.get_setting_model(name)
+        def create_combo(label, name, model):
             if model is None:
                 return None
             vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1)
@@ -74,7 +72,7 @@ class CameraControlBox(Gtk.Box):
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         for (title, cap) in settings:
-            combo = create_combo(title, cap)
+            combo = create_combo(title, cap, self.camera.models.get(cap))
             if combo is not None:
                 box.pack_start(combo, False, False, 0)
         return box

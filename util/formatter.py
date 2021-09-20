@@ -28,9 +28,9 @@ class FilenameFormatter:
             {session} - the name of the current session.
     """
 
-    def __init__(self, format="IMG_{seq:04}.{EXT}", *args, **kwargs):
+    def __init__(self, rename_rule="IMG_{seq:04}.{EXT}", **kwargs):
         """Initialize filename formater."""
-        self.format = format
+        self.format = rename_rule
         self.counter = kwargs.get('initial', 0)
         self.date = kwargs.get('date', datetime.datetime.now())
         self.format_set = {
@@ -63,7 +63,7 @@ class FilenameFormatter:
         """Add several key-value pairs to the filename formatter."""
         self.format_set.update(keys)
 
-    def filename(self, original):
+    def filename(self, original, **kwargs):
         """Format the filename given the current rules."""
         self.counter += 1
         self.set('seq', self.counter)
@@ -73,7 +73,17 @@ class FilenameFormatter:
         self.set('EXT', ext[1:].upper())
         self.set('filename', os.path.basename(filename))
         self.set('original', os.path.basename(original))
+        for key, value in kwargs.items():
+            self.set(key, value)
         return self.format.format(**self.format_set)
+
+    @property
+    def counter(self):
+        return self._counter
+
+    @counter.setter
+    def counter(self, value):
+        self._counter = value
 
     @property
     def keys(self):

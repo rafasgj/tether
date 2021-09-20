@@ -12,19 +12,27 @@ class OptionListModel(object):
         else:
             self.__initial_index(index)
 
+    @property
+    def count(self):
+        try:
+            count = len(self.model)
+        except TypeError:
+            count = self.model.choice_count()
+        return count
+
     def __initial_value(self, value):
         """Set the current value to closer valid value in the data model."""
-        index = self.get_index_from_value(self.model, value)
+        index = self.get_index_from_value(value)
         self.__initial_index(index)
 
     def __initial_index(self, index):
         """Set the current value to the given index."""
-        assert index >= 0 and index < len(self.model)
+        assert index >= 0 and index < self.count
         self.current = index
 
     def next(self):
         """Advance to next setting value."""
-        if self.current < len(self.model) - 1:
+        if self.current < self.count - 1:
             self.current += 1
 
     def previous(self):
@@ -32,10 +40,9 @@ class OptionListModel(object):
         if self.current > 0:
             self.current -= 1
 
-    @staticmethod
-    def get_index_from_value(model, value):
+    def get_index_from_value(self, value):
         """Retrieve the index of a value in the given model."""
-        for i, v in enumerate(model):
+        for i, v in enumerate(self.model):
             if value == v:
                 return i
         else:

@@ -1,31 +1,32 @@
 """Use a camera tethered to the device."""
 
-from camera import Camera
-from util.formatter import FilenameFormatter
-
 import os
-from PIL import Image
 import io
+
+from PIL import Image
+from magic import Magic
+
+import gi; gi.require_version('Gtk', '3.0')  # noqa:E702 # pylint:disable=C0321
+from gi.repository import Gtk, Gdk, GdkPixbuf
 
 from phexif import ExifTool
 
-from magic import Magic
+from ui.functions import button_with_icon_text
+from ui.cameracontrolbox import CameraControlBox
+from ui.filenametemplatedialog import FilenameTemplateDialog
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf    # noqa: E402
-from ui.functions import button_with_icon_text    # noqa: E402
-from ui.cameracontrolbox import CameraControlBox  # noqa: E402
-from ui.filenametemplatedialog import FilenameTemplateDialog  # noqa: E402
+from camera.camera import Camera, GPhoto2Driver
+from util.formatter import FilenameFormatter
 
 # Hold the last image captured
 last_image = None
 img_win = None
 
-formatter = FilenameFormatter()
+filename_formatter = FilenameFormatter()
 mime = Magic(mime=True)
 exif = ExifTool()
 exif.start()
+capture_directory = os.getcwd()
 
 
 def picture_taken(camera, filename):
@@ -64,31 +65,37 @@ def create_frame(size=(640, 80)):
     button.connect('file_set',
                    lambda b: camera.set_capture_directory(b.get_filename()))
     button.set_create_folders(True)
-    button.set_local_only(True)
-    folder = camera.capture_directory
-    folder = folder if folder else os.getcwd()
-    button.set_current_folder(folder)
+    button.set_current_folder(capture_directory)
     butns.pack_end(button, False, False, 0)
     sub.pack_start(butns, False, False, 0)
     camera_control = CameraControlBox(camera, camera.grab_frame)
     sub.pack_start(camera_control, False, False, 0)
-    button = button_with_icon_text("camera-photo", 'Shot!',
-                                   Gtk.Orientation.VERTICAL,
-                                   size=Gtk.IconSize.DIALOG)
-    button.connect('clicked', camera.grab_frame)
+    button = button_with_icon_text(
+        "camera-photo",
+        'Shot!',
+        Gtk.Orientation.VERTICAL,
+        size=Gtk.IconSize.DIALOG
+    )
+    button.connect('clicked', grab_picture)
     sub.pack_end(button, False, False, 0)
     main.pack_start(sub, False, False, 0)
     frame.add(main)
     return frame
 
 
+def grab_picture(button):
+    filename = filename_formatter.filename("image.cr2")
+    filename = camera.grab_frame(filename=filename)
+    picture_taken(camera, filename)
+
+
 def update_formatter(self, *args):
     """Update filename formatter."""
-    dialog = FilenameTemplateDialog(format=camera.filename_formatter.format,
+    dialog = FilenameTemplateDialog(format=filename_formatter.format,
                                     transient_for=None)
     if dialog.run() == Gtk.ResponseType.OK:
-        camera.filename_formatter.add_keys(dialog.user_defined)
-        camera.filename_formatter.format = dialog.filename_template
+        filename_formatter.add_keys(dialog.user_defined)
+        filename_formatter.format = dialog.filename_template
     dialog.destroy()
 
 
@@ -119,7 +126,10 @@ def create_image_window():
     img_ui.set_hexpand(True)
     img_ui.set_vexpand(True)
     img_ui.connect('draw', update_image_ui)
-    img_win.set_size_request(int(screen.width() * 0.75), int(screen.height() * 0.75))
+    img_win.set_size_request(
+        int(screen.width() * 0.75),
+        int(screen.height() * 0.75)
+    )
     img_win.add(img_ui)
     img_win.move(0, 0)
     img_win.show_all()
@@ -160,7 +170,7 @@ def display_select_folder_dialog(title, parent=None):
         dialog.add_button(*button)
     dialog.set_local_only(True)
     dialog.set_create_folders(True)
-    dialog.set_current_folder(camera.capture_directory)
+    dialog.set_current_folder(capture_directory)
     try:
         if dialog.run() == Gtk.ResponseType.OK:
             return dialog.get_filename()
@@ -203,29 +213,18 @@ if __name__ == "__main__":
 
         return win
 
-    import sys
     camera = None
     try:
-        cameras = [p for (c, p) in Camera.autodetect() if "PTP mode" not in c]
+        cameras = [p for (c, p) in GPhoto2Driver.autodetect()]
         if not cameras:
             print("No camera found.")
         else:
             port = cameras[0]
             camera = Camera(port)
-            if not camera.can_capture_image():
-                print("Camera cannot capture images with GPhoto2.")
-                sys.exit(1)
-            camera.on_frame_grab(picture_taken)
-            if camera.last_error:
-                print("Error initializing camera.")
-                print(camera.last_error)
-                camera.reset_error()
-            else:
-                win = start_gui()
-                Gtk.main()
+            win = start_gui()
+            Gtk.main()
     except Exception as ex:
         import traceback
         print(traceback.format_exc())
         print(ex)
-        if camera is not None and camera.last_error is None:
-            print("Is the camera correctly attached and turned on?  ")
+        print("Is the camera correctly attached and turned on?")
