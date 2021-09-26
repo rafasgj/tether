@@ -197,33 +197,34 @@ def change_target_directory(*args):
         camera.capture_directory = directory
 
 
+def set_application_theme():
+    """Load application theme CSS."""
+    css = b''
+    css_provider = Gtk.CssProvider()
+    css_provider.load_from_data(css)
+    context = Gtk.StyleContext()
+    screen = Gdk.Screen.get_default()
+    priority = Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    context.add_provider_for_screen(screen, css_provider, priority)
+
+
+def start_gui():
+    """Start graphical interface."""
+    set_application_theme()
+    create_image_window()
+    win = Gtk.Window()
+    win.set_decorated(False)
+    width, height = get_screen_dimension()
+    win.move(width, height)
+    win.connect("destroy", Gtk.main_quit)
+    win.add(create_frame())
+    win.show_all()
+    win.set_keep_above(True)
+
+    return win
+
+
 if __name__ == "__main__":
-    def set_application_theme():
-        """Load application theme CSS."""
-        css = b''
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_data(css)
-        context = Gtk.StyleContext()
-        screen = Gdk.Screen.get_default()
-        priority = Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        context.add_provider_for_screen(screen, css_provider, priority)
-
-    def start_gui():
-        """Start graphical interface."""
-        set_application_theme()
-        create_image_window()
-        win = Gtk.Window()
-        win.set_decorated(False)
-        width, height = get_screen_dimension()
-        win.move(width, height)
-        win.connect("destroy", Gtk.main_quit)
-        win.add(create_frame())
-        win.show_all()
-        win.set_keep_above(True)
-
-        return win
-
-    camera = None
     try:
         cameras = [p for (c, p) in GPhoto2Driver.autodetect()]
         if not cameras:
@@ -235,6 +236,5 @@ if __name__ == "__main__":
             Gtk.main()
     except Exception as ex:
         import traceback
-        print(traceback.format_exc())
-        print(ex)
-        print("Is the camera correctly attached and turned on?")
+        msg = "Is the camera correctly attached and turned on?"
+        print("%s\n%s\n%s" % (traceback.format_exc(), ex, msg))
