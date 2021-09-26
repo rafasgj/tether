@@ -115,9 +115,22 @@ def get_image_pixbuf(image):
     return data
 
 
+def get_screen_dimension():
+    display = Gdk.Display.get_default()
+    geoms = [
+        display.get_monitor(i).get_geometry()
+        for i in range(display.get_n_monitors())
+    ]
+
+    width = max(r.x + r.width for r in geoms) - min(r.x for r in geoms)
+    height = max(r.y + r.height for r in geoms) - min(r.y for r in geoms)
+
+    return width, height
+
+
 def create_image_window():
     global img_win
-    screen = Gdk.Screen.get_default()
+    width, height = get_screen_dimension()
     img_win = Gtk.Window()
     img_win.connect("destroy", Gtk.main_quit)
     img_win.set_position(Gtk.WindowPosition.CENTER)
@@ -126,10 +139,7 @@ def create_image_window():
     img_ui.set_hexpand(True)
     img_ui.set_vexpand(True)
     img_ui.connect('draw', update_image_ui)
-    img_win.set_size_request(
-        int(screen.width() * 0.75),
-        int(screen.height() * 0.75)
-    )
+    img_win.set_size_request(int(width * 0.75), int(height * 0.75))
     img_win.add(img_ui)
     img_win.move(0, 0)
     img_win.show_all()
@@ -204,8 +214,8 @@ if __name__ == "__main__":
         create_image_window()
         win = Gtk.Window()
         win.set_decorated(False)
-        screen = Gdk.Screen.get_default()
-        win.move(screen.width(), screen.height())
+        width, height = get_screen_dimension()
+        win.move(width, height)
         win.connect("destroy", Gtk.main_quit)
         win.add(create_frame())
         win.show_all()
