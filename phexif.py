@@ -5,7 +5,7 @@ import json
 from subprocess import Popen, PIPE
 
 
-class ExifTool(object):
+class ExifTool:
     """Encapsulate a running ExifTool process to retrieve metadata."""
 
     COMMAND = ["exiftool",

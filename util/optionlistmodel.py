@@ -1,7 +1,7 @@
 """Camera settings models."""
 
 
-class OptionListModel(object):
+class OptionListModel:
     """Creates a list model accessible trough indexes or values."""
 
     def __init__(self, model, value=0, index=-1):
