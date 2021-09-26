@@ -30,3 +30,7 @@ __pycache__/
 *.cr2
 *.JPG
 *.jpg
+
+# virtual environment
+/.venv/
+/.tox/
