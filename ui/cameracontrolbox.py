@@ -28,8 +28,14 @@ class CameraControlBox(Gtk.Box):
         settings = self.__create_camera_settings_box(camera)
         internal.pack_start(settings, False, False, 0)
         # Camera Properties box
-        internal.pack_start(self.__create_camera_properties_box(camera.model,
-                            camera.lensname), False, False, 0)
+        model = camera.cameramodel
+        lensname = camera.lensname
+        internal.pack_start(
+            self.__create_camera_properties_box(model, lensname),
+            False,
+            False,
+            0
+        )
 
     def __create_camera_settings_box(self, camera):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)

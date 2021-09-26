@@ -32,7 +32,7 @@ class Camera:
         "readonly": [
             'shuttercounter',
             'lensname',
-            'model',
+            'cameramodel',
             'serialnumber',
             'batterylevel'
         ]
@@ -63,7 +63,8 @@ class Camera:
         props = Camera.properties['config'] + Camera.properties['readonly']
         if name in props:
             try:
-                return self.__cam.get_attribute(name)
+                value = self.__cam.get_attribute(name)
+                return value
             except GPhoto2Error:
                 return None
         return getattr(super(), name)
