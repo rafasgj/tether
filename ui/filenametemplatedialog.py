@@ -146,22 +146,3 @@ class FilenameTemplateDialog(Gtk.Dialog):
             flowbox.add(button)
         sbox.pack_start(flowbox, False, False, 0)
         return iframe
-
-
-if __name__ == "__main__":
-    from util.formatter import FilenameFormatter
-    custom_list = (
-        ("Camera Model", '{model}'),
-        ("Lens Model", '{lens}'),
-        ("Camera Serial Number", '{camera_serial}')
-    )
-    dialog = Gtk.Window()
-    x = FilenameTemplateDialog(title="Create Filename Template",
-                               transient_for=dialog,
-                               custom_strings=custom_list)
-    ok = x.run()
-    formatter = FilenameFormatter(format=x.filename_template)
-    formatter.add_keys(x.user_defined)
-    dialog.connect("destroy", Gtk.main_quit)
-    dialog.show_all()
-    print("Filename:", formatter.filename("image.jpg"))

@@ -84,13 +84,3 @@ class Camera:
             filename = self.__cam.capture_to_file(filename)
             return filename
         return self.__cam.capture_to_stream()
-
-
-if __name__ == "__main__":
-    ports = [p for (c, p) in Camera.autodetect() if "PTP mode" not in c]
-    if ports:
-        cam = Camera(ports[0])
-        print(cam.__cam.get_widget('drivemode'))  # pylint:disable=W0212
-        print(cam.drivemode)
-    else:
-        print("No camera found.")
