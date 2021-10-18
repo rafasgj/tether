@@ -48,7 +48,7 @@ class Camera:
         self.filename_formatter = FilenameFormatter()
         self.models = dict(
             iso=self.__create_setting_model("iso"),
-            shutter=self.__create_setting_model("shutterspeed"),
+            shutterspeed=self.__create_setting_model("shutterspeed"),
             aperture=self.__create_setting_model("aperture"),
         )
 
@@ -78,7 +78,8 @@ class Camera:
         if not self.__cam.can_capture_image():
             raise CameraError("Camera cannot capture images with GPhoto2.")
         for setting in ["shutterspeed", "aperture", "iso"]:
-            value = kwargs.get(setting)
+            model = self.models.get(setting)
+            value = kwargs.get(setting, model.value if model else None)
             if value:
                 self.__cam[setting] = value
         if filename:

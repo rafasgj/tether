@@ -41,12 +41,13 @@ class CameraControlBox(Gtk.Box):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         box.set_homogeneous(False)
         models = (
-            ("Shutter", "shutter"),
+            ("Shutter", "shutterspeed"),
             ("Aperture", "aperture"),
             ("ISO", "iso"),
         )
         for title, model in models:
             selector = OptionSelector(title, camera.models.get(model))
+            setattr(self, model, selector)
             box.pack_start(selector, False, False, 0)
         return box
 
