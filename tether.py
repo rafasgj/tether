@@ -15,7 +15,8 @@ from ui.functions import button_with_icon_text
 from ui.cameracontrolbox import CameraControlBox
 from ui.filenametemplatedialog import FilenameTemplateDialog
 
-from camera.camera import Camera, GPhoto2Driver
+from camera.camera import Camera
+from camera.gphoto2driver import GPhoto2Driver
 from util.formatter import FilenameFormatter
 
 # Hold the last image captured
@@ -231,7 +232,7 @@ if __name__ == "__main__":
             print("No camera found.")
         else:
             port = cameras[0]
-            camera = Camera(port)
+            camera = Camera(GPhoto2Driver(port))
             win = start_gui()
             Gtk.main()
     except Exception as ex:

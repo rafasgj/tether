@@ -3,19 +3,18 @@
 import io
 import gphoto2 as gp  # pylint: disable=import-error
 
+from camera.cameradriver import CameraDriver
+
 
 class GPhoto2Error(Exception):
     """Raised when camera object is not ready for use."""
 
     def __init__(self, msg=None):
         """Initialize exception object."""
-        super().__init__(
-            "Camera object not initialized%s"
-            % ((": %s" % msg) if msg else ".")
-        )
+        super().__init__(f"{msg}" if msg else "Unknown GPhoto2 error.")
 
 
-class GPhoto2Driver:
+class GPhoto2Driver(CameraDriver):
     """Abstract the usage for GPhoto2 with higher level commands."""
 
     @staticmethod
@@ -25,20 +24,20 @@ class GPhoto2Driver:
         return tuple(tuple(camport) for camport in cameras)
 
     def __init__(self, port=None):
-        self.__config = None
         self.__port = port
+        self.__config = None
         self.__cam = None
         self.__ctx = None
-        self.__init_cam(port)
+        self.__init_cam()
 
-    def __init_cam(self, port):
+    def __init_cam(self):
         try:
             self.__ctx = gp.Context()
             self.__cam = gp.Camera()
-            if port is not None:
+            if self.__port is not None:
                 port_info_list = gp.PortInfoList()
                 port_info_list.load()
-                idx = port_info_list.lookup_path(port)
+                idx = port_info_list.lookup_path(self.__port)
                 self.__cam.set_port_info(port_info_list[idx])
             self.__cam.init(self.__ctx)
         except gp.GPhoto2Error as gpex:
@@ -47,8 +46,7 @@ class GPhoto2Driver:
                 error = "No camera found."
             else:
                 error = str(gpex)
-            msg = "{} GPhoto2 Error Code: {}"
-            raise GPhoto2Error(msg.format(error, gpex.code)) from None
+            raise GPhoto2Error(f"{error} (error code: {gpex.code})") from None
         else:
             self.__config = self.__cam.get_config()
 
@@ -66,14 +64,14 @@ class GPhoto2Driver:
     def is_ready(self):
         return self.__cam is not None
 
-    def get_choices_for(self, name):
+    def get_choices_for(self, setting):
         """Return a list of elements for a CameraSettingCombo."""
-        widget = self.__get_widget(name)
+        widget = self.__get_widget(setting)
         return None if widget is None else list(widget.get_choices())
 
     def restart(self):
         self.__invalidate_cam()
-        self.__init_cam(self.__port)
+        self.__init_cam()
 
     def __get_widget(self, name):
         try:
@@ -81,19 +79,19 @@ class GPhoto2Driver:
         except Exception:
             raise GPhoto2Error("Invalid widget '{}''".format(name)) from None
 
-    def get_attribute(self, name):
+    def get_value_for(self, setting):
         if not self.is_ready:
             raise GPhoto2Error("Device not ready.")
         try:
-            widget = self.__get_widget(name)
+            widget = self.__get_widget(setting)
             return widget.get_value()
         except:  # noqa # pylint: disable=W0702
             abilities = self.__cam.get_abilities()
-            if hasattr(abilities, name):
-                return getattr(abilities, name)
-        raise GPhoto2Error("Invalid attribute '{}''".format(name))
+            if hasattr(abilities, setting):
+                return getattr(abilities, setting)
+        raise TypeError(setting)
 
-    def set_attribute(self, name, value):
+    def set_value_for(self, name, value):
         widget = self.__get_widget(name)
         widget.set_value(value)
         self.__cam.set_config(self.__config)
@@ -102,8 +100,9 @@ class GPhoto2Driver:
         """Query if the camera can capture images."""
         if self.is_ready:
             abilities = self.__cam.get_abilities()
-            flags = gp.GP_OPERATION_CAPTURE_IMAGE
-            flags |= gp.GP_OPERATION_CAPTURE_PREVIEW
+            flags = (
+                gp.GP_OPERATION_CAPTURE_IMAGE | gp.GP_OPERATION_CAPTURE_PREVIEW
+            )
             return abilities.operations & flags
         return False
 
@@ -127,7 +126,7 @@ class GPhoto2Driver:
         return io.BytesIO(filedata)
 
     def __getitem__(self, name):
-        return self.get_attribute(name)
+        return self.get_value_for(name)
 
     def __setitem__(self, name, value):
-        self.set_attribute(name, value)
+        self.set_value_for(name, value)

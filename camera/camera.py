@@ -1,18 +1,13 @@
 """Holds camera settings."""
 
-# import os
-# import os.path
+from typing import Any
+
 from util.formatter import FilenameFormatter
 from util import OptionListModel
 
-# try:
-#     from PIL import Image
-#     __NO_PIL_IMAGE__ = True
-# except ImportError:
-#     __NO_PIL_IMAGE__ = False
-
 from camera.errors import CameraError
-from camera.gphoto2driver import GPhoto2Driver, GPhoto2Error
+
+from camera.cameradriver import CameraDriver
 
 
 class Camera:
@@ -38,13 +33,14 @@ class Camera:
         ]
     }
 
-    def __init__(self, port=None):
+    def __init__(self, camera_driver: CameraDriver) -> None:
         """Initialize the camera object.
 
-        Parameters:
-            port: The libgphoto2 camera port for the camera.
+        Parameters
+        ----------
+        cameradriver: The camera driver to use.
         """
-        self.__cam = GPhoto2Driver(port)
+        self.__cam = camera_driver
         self.filename_formatter = FilenameFormatter()
         self.models = dict(
             iso=self.__create_setting_model("iso"),
@@ -52,28 +48,40 @@ class Camera:
             aperture=self.__create_setting_model("aperture"),
         )
 
-    def __create_setting_model(self, var):
-        model = self.__cam.get_choices_for(var)
+    def __create_setting_model(self, setting: str) -> OptionListModel:
+        model = self.__cam.get_choices_for(setting)
         if model is not None:
-            return OptionListModel(model, getattr(self, var))
+            return OptionListModel(model, getattr(self, setting))
         return None
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         """Overide 'getters' to easily deal with camera properties."""
         props = Camera.properties['config'] + Camera.properties['readonly']
         if name in props:
             try:
-                value = self.__cam.get_attribute(name)
+                value = self.__cam.get_value_for(name)
                 return value
-            except GPhoto2Error:
+            except TypeError:
                 return None
         return getattr(super(), name)
 
     def grab_frame(self, filename=None, **kwargs):
-        """Grabe a frame from camera, to a file, or as a BytesIO stream.
+        """Grab a frame from camera, to a file, or as a BytesIO stream.
 
-        Parameters:
-            filename: If set, grab image to this file.
+        Parameters
+        ----------
+            filename: string
+                If set, grab image to this file.
+            shutterspeed: string
+                Camera shutter speed to use.
+            aperture:
+                Camera aperture to use.
+            iso:
+                Camera ISO (light sensitivity) value to use.
+
+        Return
+        ------
+            The filename or the data stream.
         """
         if not self.__cam.can_capture_image():
             raise CameraError("Camera cannot capture images with GPhoto2.")
