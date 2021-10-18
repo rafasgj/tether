@@ -14,11 +14,7 @@ class OptionListModel:
 
     @property
     def count(self):
-        try:
-            count = len(self.model)
-        except TypeError:
-            count = self.model.choice_count()
-        return count
+        return len(self.model)
 
     def __initial_value(self, value):
         """Set the current value to closer valid value in the data model."""
