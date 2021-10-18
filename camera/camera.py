@@ -3,7 +3,7 @@
 from typing import Any
 
 from util.formatter import FilenameFormatter
-from util import OptionListModel
+from camera.util.optionlistmodel import OptionListModel
 
 from camera.errors import CameraError
 
@@ -33,26 +33,42 @@ class Camera:
         ]
     }
 
-    def __init__(self, camera_driver: CameraDriver) -> None:
+    def __init__(self, camera_driver: CameraDriver, **options):
         """Initialize the camera object.
 
         Parameters
         ----------
-        cameradriver: The camera driver to use.
+        cameradriver: camera_drive
+            The camera driver to use.
+        options: variable
+            A list of optional configuration options;
+            - set_on_capture: bool
+                Control if settings take effect on capture (True) or
+                imediatelly after model changes (False).
+                Default to True
         """
         self.__cam = camera_driver
         self.filename_formatter = FilenameFormatter()
-        self.models = dict(
-            iso=self.__create_setting_model("iso"),
-            shutterspeed=self.__create_setting_model("shutterspeed"),
-            aperture=self.__create_setting_model("aperture"),
-        )
+        set_on_capture = options.get("set_on_capture", True)
+        self.models = {
+            setting: self.__create_setting_model(setting, set_on_capture)
+            for setting in ["iso", "shutterspeed", "aperture"]
+        }
 
-    def __create_setting_model(self, setting: str) -> OptionListModel:
+    def __create_setting_model(self, setting, set_on_capture=True):
+        """Create an OptionListModel for camera setting."""
+        result = None
         model = self.__cam.get_choices_for(setting)
         if model is not None:
-            return OptionListModel(model, getattr(self, setting))
-        return None
+            result = OptionListModel(model, getattr(self, setting))
+            if not set_on_capture:
+                result.connect("changed", self._on_setting_change)
+        return result
+
+    def _on_setting_change(self, _sender: OptionListModel) -> None:
+        """Respond to setting change."""
+        for setting, model in self.models.items():
+            setattr(self, setting, model.value)
 
     def __getattr__(self, name: str) -> Any:
         """Overide 'getters' to easily deal with camera properties."""
@@ -64,6 +80,13 @@ class Camera:
             except TypeError:
                 return None
         return getattr(super(), name)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Overide 'getters' to easily deal with camera properties."""
+        props = Camera.properties["config"] + Camera.properties["readonly"]
+        if name in props:
+            self.__cam.set_value_for(name, value)
+        return super().__setattr__(name, value)
 
     def grab_frame(self, filename=None, **kwargs):
         """Grab a frame from camera, to a file, or as a BytesIO stream.
