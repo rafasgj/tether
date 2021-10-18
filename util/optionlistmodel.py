@@ -23,7 +23,7 @@ class OptionListModel:
 
     def __initial_index(self, index):
         """Set the current value to the given index."""
-        assert index >= 0 and index < self.count
+        assert 0 <= index >= 0 < self.count
         self.current = index
 
     def next(self):
@@ -38,11 +38,10 @@ class OptionListModel:
 
     def get_index_from_value(self, value):
         """Retrieve the index of a value in the given model."""
-        for i, v in enumerate(self.model):
+        for i, v in enumerate(self.model):  # pylint: disable=invalid-name
             if value == v:
                 return i
-        else:
-            return -1
+        return -1
 
     @property
     def value(self):

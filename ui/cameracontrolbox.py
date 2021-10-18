@@ -28,8 +28,8 @@ class CameraControlBox(Gtk.Box):
         settings = self.__create_camera_settings_box(camera)
         internal.pack_start(settings, False, False, 0)
         # Camera Properties box
-        model = camera.cameramodel
-        lensname = camera.lensname
+        model = camera.cameramodel or ""
+        lensname = camera.lensname or ""
         internal.pack_start(
             self.__create_camera_properties_box(model, lensname),
             False,
