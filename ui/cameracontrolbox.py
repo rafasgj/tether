@@ -2,8 +2,8 @@
 
 from gi.repository import Gtk
 from .optionselector import OptionSelector
-from .listcombobox import ListComboBox
-from .functions import label_with_character_size
+# from .listcombobox import ListComboBox
+# from .functions import label_with_character_size
 
 
 class CameraControlBox(Gtk.Box):
@@ -15,12 +15,12 @@ class CameraControlBox(Gtk.Box):
                          spacing=10)
         self.set_homogeneous(False)
         self.camera = camera
-        # Combo settings
-        cbs = [("White\nBalance", "whitebalance"),
-               ("Image\nFormat", "imageformat")]
-        self.pack_start(self.__create_combo_settings(cbs), False, False, 0)
-        cbs = [("Drive Mode", "drivemode")]
-        self.pack_start(self.__create_combo_settings(cbs), False, False, 0)
+        # # Combo settings
+        # cbs = [("White\nBalance", "whitebalance"),
+        #        ("Image\nFormat", "imageformat")]
+        # self.pack_start(self.__create_combo_settings(cbs), False, False, 0)
+        # cbs = [("Drive Mode", "drivemode")]
+        # self.pack_start(self.__create_combo_settings(cbs), False, False, 0)
         # Camera Settings box
         internal = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         internal.set_homogeneous(False)
@@ -50,38 +50,38 @@ class CameraControlBox(Gtk.Box):
             box.pack_start(selector, False, False, 0)
         return box
 
-    def __create_combo_settings(self, settings):
-        """Create UI for Wite Balance and Image Format."""
-        def set_value_if(model, _, iter, name):
-            value = getattr(self.camera, name)
-            if model[iter][0] == value:
-                getattr(self, name).set_active_iter(iter)
-                return True
-            else:
-                return False
-
-        def create_combo(label, name, model):
-            if model is None:
-                return None
-            vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1)
-            # TODO: this 3-line hack computes the alleged max label size.
-            text = label_with_character_size(7)
-            text.set_text(label)
-            vbox.pack_start(text, False, False, 0)
-            cb = ListComboBox(model)
-            setattr(self, name, cb)
-            cb.get_model().foreach(set_value_if, name)
-            cb.connect('changed',
-                       lambda combo: setattr(self.camera, name, combo.value))
-            vbox.pack_start(cb, True, True, 0)
-            return vbox
-
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        for (title, cap) in settings:
-            combo = create_combo(title, cap, self.camera.models.get(cap))
-            if combo is not None:
-                box.pack_start(combo, False, False, 0)
-        return box
+    # def __create_combo_settings(self, settings):
+    #     """Create UI for Wite Balance and Image Format."""
+    #     def set_value_if(model, _, iter, name):
+    #         value = getattr(self.camera, name)
+    #         if model[iter][0] == value:
+    #             getattr(self, name).set_active_iter(iter)
+    #             return True
+    #         else:
+    #             return False
+    #
+    #     def create_combo(label, name, model):
+    #         if model is None:
+    #             return None
+    #         vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1)
+    #         # TODO: this 3-line hack computes the alleged max label size.
+    #         text = label_with_character_size(7)
+    #         text.set_text(label)
+    #         vbox.pack_start(text, False, False, 0)
+    #         cb = ListComboBox(model)
+    #         setattr(self, name, cb)
+    #         cb.get_model().foreach(set_value_if, name)
+    #         cb.connect("changed",
+    #                    lambda combo: setattr(self.camera, name, combo.value))
+    #         vbox.pack_start(cb, True, True, 0)
+    #         return vbox
+    #
+    #     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    #     for (title, cap) in settings:
+    #         combo = create_combo(title, cap, self.camera.models.get(cap))
+    #         if combo is not None:
+    #             box.pack_start(combo, False, False, 0)
+    #     return box
 
     def __create_camera_properties_box(self, model, lens):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
