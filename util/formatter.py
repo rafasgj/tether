@@ -96,10 +96,12 @@ class FilenameFormatter:
 
     @property
     def counter(self):
+        """Retrieve current sequence counter."""
         return self._counter
 
     @counter.setter
     def counter(self, value):
+        """Set sequence counter."""
         self._counter = value
 
     @property

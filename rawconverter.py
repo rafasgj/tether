@@ -17,7 +17,7 @@
 
 """Raw converter test."""
 
-import rawpy
+import rawpy  # pylint: disable=import-error
 from PIL import Image
 
 __params = rawpy.Params(
@@ -42,6 +42,6 @@ if __name__ == "__main__":
     import sys
     import os.path
 
-    filename, ext = os.path.splitext(os.path.basename(sys.argv[1]))
+    fname, ext = os.path.splitext(os.path.basename(sys.argv[1]))
     img = image_from_raw(sys.argv[1])
-    img.save("{}.jpg".format(filename))
+    img.save(f"{fname}.jpg")

@@ -23,11 +23,11 @@ from gi.repository import Gtk
 def label_with_character_size(size):
     """Create a label with a size defined by the number of characters."""
     label = Gtk.Label()
-    # TODO: this 4-line hack computes the alleged max label size.
-    sz = Gtk.Label(label="W" * size)
-    sz.show()
-    sz = sz.size_request()
-    label.set_size_request(sz.width, sz.height)
+    # This 4-line hack computes the alleged max label size.
+    szlabel = Gtk.Label(label="W" * size)
+    szlabel.show()
+    label_dim = szlabel.size_request()
+    label.set_size_request(label_dim.width, label_dim.height)
     return label
 
 

@@ -6,14 +6,14 @@ from collections.abc import Callable
 class Notifiable:
     """Implement a basic signaling mechanism."""
 
-    def __init__(self, /, connectors=None):
+    def __init__(self, connectors=None):
         """
         Initialize notification mechanism.
 
         Parameters
         ----------
-            connectors: list of string
-                The list of signals the object exposes.
+        connectors: list of string
+            The list of signals the object exposes.
 
         """
         if not (connectors and isinstance(connectors, (tuple, list))):
@@ -28,11 +28,10 @@ class Notifiable:
 
         Parameters
         ----------
-            connector: string
-                The signal name to connect.
-                Any of 'previous', 'next', 'change'.
-            callable: Callable
-                The callable that will be called upon signal notification.
+        connector: string
+            The signal name to connect. Any of 'previous', 'next', 'change'.
+        callable: Callable
+            The callable that will be called upon signal notification.
 
         """
         if connector not in self.__pins:
@@ -47,8 +46,8 @@ class Notifiable:
 
         Parameters
         ----------
-            connectors: list of strings
-                Connectors to be notified.
+        connectors: list of strings
+            Connectors to be notified.
 
         """
         for connector in connectors:

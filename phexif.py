@@ -45,11 +45,13 @@ class ExifTool:
 
     def start(self):
         """Initialize the Exiftool application."""
+        # pylint: disable=unspecified-encoding
         with open(os.devnull, "w") as devnull:
-            self._process = Popen(
+            self._process = Popen(  # pylint: disable=consider-using-with
                 ExifTool.COMMAND, stdin=PIPE, stdout=PIPE, stderr=devnull
             )
             self._running = True
+        # pylint: enable=unspecified-encoding
 
     def terminate(self):
         """Terminate the running process if it is still running."""
@@ -63,12 +65,12 @@ class ExifTool:
         if not self._running:
             raise Exception("This should only be called from inside ExifTool.")
         output = b""
-        rd = b""
+        data = b""
         lsz = -len(mark)
-        fd = self._process.stdout.fileno()
-        while not rd[2 * lsz :].strip().endswith(mark):
-            rd = os.read(fd, 4096)
-            output += rd
+        stdout_fd = self._process.stdout.fileno()
+        while not data[2 * lsz :].strip().endswith(mark):
+            data = os.read(stdout_fd, 4096)
+            output += data
         return output.strip()[:lsz]
 
     def _execute(self, *files):
@@ -92,7 +94,9 @@ class ExifTool:
         """Send a command to the running process."""
         if self._running:
             params = [i for subl in args for i in subl]
+            # pylint: disable=consider-using-f-string
             data = "%s\n" % "\n".join(params)
+            # pylint: enable=consider-using-f-string
             self._process.stdin.write(bytes(data.encode("utf-8")))
             self._process.stdin.flush()
 

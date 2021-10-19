@@ -51,11 +51,12 @@ class Camera:
     }
 
     def __init__(self, camera_driver: CameraDriver, **options):
-        """Initialize the camera object.
+        """
+        Initialize the camera object.
 
         Parameters
         ----------
-        cameradriver: camera_drive
+        camera_driver: CameraDriver
             The camera driver to use.
         options: variable
             A list of optional configuration options;
@@ -63,6 +64,7 @@ class Camera:
                 Control if settings take effect on capture (True) or
                 imediatelly after model changes (False).
                 Default to True
+
         """
         self.__cam = camera_driver
         self.filename_formatter = FilenameFormatter()
@@ -106,22 +108,24 @@ class Camera:
         return super().__setattr__(name, value)
 
     def grab_frame(self, filename=None, **kwargs):
-        """Grab a frame from camera, to a file, or as a BytesIO stream.
+        """
+        Grab a frame from camera, to a file, or as a BytesIO stream.
 
         Parameters
         ----------
-            filename: string
-                If set, grab image to this file.
-            shutterspeed: string
-                Camera shutter speed to use.
-            aperture:
-                Camera aperture to use.
-            iso:
-                Camera ISO (light sensitivity) value to use.
+        filename: string
+            If set, grab image to this file.
+        shutterspeed: string
+            Camera shutter speed to use.
+        aperture:
+            Camera aperture to use.
+        iso:
+            Camera ISO (light sensitivity) value to use.
 
         Return
         ------
             The filename or the data stream.
+
         """
         if not self.__cam.can_capture_image():
             raise CameraError("Camera cannot capture images with GPhoto2.")

@@ -19,29 +19,23 @@
 
 import gi
 
-gi.require_version("Gtk", "3.0")  # noqa: E702
-from gi.repository import Gtk
+gi.require_version("Gtk", "3.0")  # noqa:E702 # pylint:disable=C0321
 
-"""
-Define an object that transform filenames using metadata.
+# pylint: disable=wrong-import-position
+from gi.repository import Gtk  # noqa: E402
 
-Filename creation rules:
-
-    A user may add new keys, like:
-        {camera} - camera serial number.
-        {lens} - lens serial number (not yet supported).
-"""
+# pylint: enable=wrong-import-position
 
 
 class FilenameTemplateDialog(Gtk.Dialog):
     """Define a template that allow the definition of a filename template."""
 
-    def __init__(self, format="", *args, **kwargs):
+    def __init__(self, *args, format_string="", **kwargs):
         """Initialize the dialog."""
         Gtk.Dialog.__init__(
             self,
             *args,
-            **{k: kwargs[k] for k in kwargs if k not in ["custom_strings"]},
+            **{key: kwargs[key] for key in kwargs.keys() - {"custom_strings"}},
         )
         self.set_size_request(*(450, 300))
         self.add_buttons(
@@ -58,12 +52,12 @@ class FilenameTemplateDialog(Gtk.Dialog):
         frame.set_shadow_type(Gtk.ShadowType.NONE)
         frame.add(self.box)
         frame.set_border_width(8)
-        self.vbox.pack_start(frame, False, False, 0)
+        self.vbox.pack_start(frame, False, False, 0)  # pylint:disable=no-member
         #
         self.entry = Gtk.Entry()
         self.entry.vexpand = False
         self.entry.hexpand = True
-        self.entry.set_text(format)
+        self.entry.set_text(format_string)
         self.box.pack_start(self.entry, False, False, 0)
         #
         self.add_entry("Custom Text", "custom_text")
@@ -102,7 +96,7 @@ class FilenameTemplateDialog(Gtk.Dialog):
             flowbox = self.__create_flow_box("Custom", custom_strings)
             self.box.pack_start(flowbox, False, False, 0)
         #
-        self.show_all()
+        self.show_all()  # pylint:disable=no-member
 
     @property
     def filename_template(self):
@@ -117,7 +111,8 @@ class FilenameTemplateDialog(Gtk.Dialog):
     def __text_changed(self, entry, name):
         self.entries[name] = entry.get_text()
 
-    def __add_text(self, button, entry, text):
+    @staticmethod
+    def __add_text(_sender, entry, text):
         old_text = entry.get_text()
         bounds = entry.get_selection_bounds()
         if bounds:
@@ -147,14 +142,13 @@ class FilenameTemplateDialog(Gtk.Dialog):
         sbox.pack_start(entry, True, True, 0)
 
         button = Gtk.Button(label="Insert")
-        text_to_add = "{{{}}}".format(field)
-        button.connect("clicked", self.__add_text, self.entry, text_to_add)
+        button.connect("clicked", self.__add_text, self.entry, f"{{{field}}}")
         sbox.pack_start(button, False, False, 0)
         self.box.pack_start(sbox, False, False, 0)
 
     def __create_flow_box(self, title, itemlist):
         """Create a flowbox with a list of itens."""
-        iframe = Gtk.Frame(label=" {} ".format(title))
+        iframe = Gtk.Frame(label=f" {title} ")
         iframe.set_border_width(0)
         iframe.set_label_align(0.02, 0.5)
         sbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)

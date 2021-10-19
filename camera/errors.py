@@ -23,4 +23,4 @@ class CameraError(Exception):
 
     def __init__(self, msg=None):
         """Initialize exception object."""
-        super().__init__("Camera error: %s" % (msg if msg else "Unkown"))
+        super().__init__(f"Camera error: {msg if msg else 'Unkown'}")

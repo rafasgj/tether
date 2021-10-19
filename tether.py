@@ -26,42 +26,47 @@ from magic import Magic
 import gi
 
 gi.require_version("Gtk", "3.0")  # noqa:E702 # pylint:disable=C0321
-from gi.repository import Gtk, Gdk, GdkPixbuf
 
-from phexif import ExifTool
+# pylint: disable=wrong-import-position
+from gi.repository import Gtk, Gdk, GdkPixbuf  # noqa: E402
 
-from ui.functions import button_with_icon_text
-from ui.cameracontrolbox import CameraControlBox
-from ui.filenametemplatedialog import FilenameTemplateDialog
+from phexif import ExifTool  # noqa: E402
 
-from camera.camera import Camera
-from camera.gphoto2driver import GPhoto2Driver
-from util.formatter import FilenameFormatter
+from ui.functions import button_with_icon_text  # noqa: E402
+from ui.cameracontrolbox import CameraControlBox  # noqa: E402
+from ui.filenametemplatedialog import FilenameTemplateDialog  # noqa: E402
+
+from camera.camera import Camera  # noqa: E402
+from camera.gphoto2driver import GPhoto2Driver  # noqa: E402
+from util.formatter import FilenameFormatter  # noqa: E402
+
+# pylint: enable=wrong-import-position
+
 
 # Hold the last image captured
-last_image = None
-img_win = None
+last_image = None  # pylint: disable=invalid-name
+img_win = None  # pylint: disable=invalid-name
 
 filename_formatter = FilenameFormatter()
-mime = Magic(mime=True)
+mime = Magic(True)
 exif = ExifTool()
 exif.start()
 capture_directory = os.getcwd()
 
 
-def picture_taken(camera, filename):
+def picture_taken(_camera, fname):
     """Handle new frame signal."""
-    global last_image
+    global last_image  # pylint: disable=invalid-name,global-statement
     pil = ("image/jpeg", "image/tiff", "image/gif", "image/png")
-    mime_type = mime.from_file(filename)
-    metadata = exif.get_metadata(filename)[0]
+    mime_type = mime.from_file(fname)  # pylint: disable=no-member
+    metadata = exif.get_metadata(fname)[0]
     key = "EXIF:Orientation"
     rotation = [0, 0, 0, 180, 0, 0, -90, 0, 90]
     orientation = rotation[int(metadata[key])] if key in metadata else 0
     if mime_type in pil:
-        last_image = Image.open(filename)
+        last_image = Image.open(fname)
     else:
-        reader = io.BytesIO(exif.get_image_preview(filename))
+        reader = io.BytesIO(exif.get_image_preview(fname))
         last_image = Image.open(reader)
     last_image = last_image.rotate(orientation, expand=True)
     img_win.queue_draw()
@@ -104,18 +109,19 @@ def create_frame(size=(640, 80)):
     return frame
 
 
-def grab_picture(button):
+def grab_picture(_sender):
+    """Format filename and grab picture from camera."""
     filename = filename_formatter.filename("image.cr2")
     filename = camera.grab_frame(filename=filename)
     picture_taken(camera, filename)
 
 
-def update_formatter(self, *args):
+def update_formatter(_sender, *_args):
     """Update filename formatter."""
     dialog = FilenameTemplateDialog(
         format=filename_formatter.format, transient_for=None
     )
-    if dialog.run() == Gtk.ResponseType.OK:
+    if dialog.run() == Gtk.ResponseType.OK:  # pylint: disable=no-member
         filename_formatter.add_keys(dialog.user_defined)
         filename_formatter.format = dialog.filename_template
     dialog.destroy()
@@ -138,6 +144,7 @@ def get_image_pixbuf(image):
 
 
 def get_screen_dimension():
+    """Retrieve current screen dimension, in pixels."""
     display = Gdk.Display.get_default()
     geoms = [
         display.get_monitor(i).get_geometry()
@@ -151,7 +158,8 @@ def get_screen_dimension():
 
 
 def create_image_window():
-    global img_win
+    """Create window to display image."""
+    global img_win  # pylint: disable=invalid-name, global-statement
     width, height = get_screen_dimension()
     img_win = Gtk.Window()
     img_win.connect("destroy", Gtk.main_quit)
@@ -170,6 +178,7 @@ def create_image_window():
 def update_image_ui(drawing_area, cairo_context):
     """Update image displayed."""
     if last_image is not None:
+        # pylint: disable=invalid-name
         img_win.activate()
         data = get_image_pixbuf(last_image)
         iw, ih = data.get_width(), data.get_height()
@@ -188,6 +197,7 @@ def update_image_ui(drawing_area, cairo_context):
             y = h // 2 - rh // 2
         Gdk.cairo_set_source_pixbuf(cairo_context, data, x, y)
         cairo_context.paint()
+        # pylint: enable=invalid-name
     return False
 
 
@@ -209,13 +219,12 @@ def display_select_folder_dialog(title, parent=None):
     try:
         if dialog.run() == Gtk.ResponseType.OK:
             return dialog.get_filename()
-        else:
-            return None
     finally:
         dialog.destroy()
+    return None
 
 
-def change_target_directory(*args):
+def change_target_directory(*_args):
     """Ask user for the new capture directory."""
     directory = display_select_folder_dialog("Select capture folder", win)
     if directory:
@@ -237,16 +246,16 @@ def start_gui():
     """Start graphical interface."""
     set_application_theme()
     create_image_window()
-    win = Gtk.Window()
-    win.set_decorated(False)
+    window = Gtk.Window()
+    window.set_decorated(False)
     width, height = get_screen_dimension()
-    win.move(width, height)
-    win.connect("destroy", Gtk.main_quit)
-    win.add(create_frame())
-    win.show_all()
-    win.set_keep_above(True)
+    window.move(width, height)
+    window.connect("destroy", Gtk.main_quit)
+    window.add(create_frame())
+    window.show_all()
+    window.set_keep_above(True)
 
-    return win
+    return window
 
 
 if __name__ == "__main__":
@@ -259,8 +268,10 @@ if __name__ == "__main__":
             camera = Camera(GPhoto2Driver(port))
             win = start_gui()
             Gtk.main()
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         import traceback
 
-        msg = "Is the camera correctly attached and turned on?"
-        print("%s\n%s\n%s" % (traceback.format_exc(), ex, msg))
+        MSG = "Is the camera correctly attached and turned on?"
+        # pylint: disable=consider-using-f-string
+        print("%s\n%s\n%s" % (traceback.format_exc(), ex, MSG))
+        # pylint: enable=consider-using-f-string

@@ -27,7 +27,7 @@ from .optionselector import OptionSelector
 class CameraControlBox(Gtk.Box):
     """Create box to control camera settings."""
 
-    def __init__(self, camera, cb=None):
+    def __init__(self, camera, _cb=None):
         """Initialize the UI composed component."""
         Gtk.Box.__init__(
             self, orientation=Gtk.Orientation.HORIZONTAL, spacing=10
@@ -43,7 +43,7 @@ class CameraControlBox(Gtk.Box):
         # Camera Settings box
         internal = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         internal.set_homogeneous(False)
-        self.pack_start(internal, False, False, 0)
+        self.pack_start(internal, False, False, 0)  # pylint: disable=no-member
         settings = self.__create_camera_settings_box(camera)
         internal.pack_start(settings, False, False, 0)
         # Camera Properties box
@@ -84,7 +84,7 @@ class CameraControlBox(Gtk.Box):
     #         if model is None:
     #             return None
     #         vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1)
-    #         # TODO: this 3-line hack computes the alleged max label size.
+    #         # This 3-line hack computes the alleged max label size.
     #         text = label_with_character_size(7)
     #         text.set_text(label)
     #         vbox.pack_start(text, False, False, 0)
@@ -103,7 +103,8 @@ class CameraControlBox(Gtk.Box):
     #             box.pack_start(combo, False, False, 0)
     #     return box
 
-    def __create_camera_properties_box(self, model, lens):
+    @staticmethod
+    def __create_camera_properties_box(model, lens):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
         box.set_homogeneous(True)
         camera_model = Gtk.Label(label=model)

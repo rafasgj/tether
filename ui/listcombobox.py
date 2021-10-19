@@ -39,5 +39,5 @@ class ListComboBox(Gtk.ComboBox):
     def value(self):
         """Retrieve the currently selected item."""
         model = self.get_model()
-        iter = self.get_active_iter()
-        return model[iter][0]
+        iterator = self.get_active_iter()
+        return model[iterator][0]
