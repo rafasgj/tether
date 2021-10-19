@@ -30,15 +30,15 @@ gi.require_version("Gtk", "3.0")  # noqa:E702 # pylint:disable=C0321
 # pylint: disable=wrong-import-position
 from gi.repository import Gtk, Gdk, GdkPixbuf  # noqa: E402
 
-from phexif import ExifTool  # noqa: E402
+from photosuite.ui.functions import button_with_icon_text  # noqa: E402
+from photosuite.ui.cameracontrolbox import CameraControlBox  # noqa: E402
+from photosuite.ui.filenametemplatedialog import FilenameTemplateDialog  # noqa
 
-from ui.functions import button_with_icon_text  # noqa: E402
-from ui.cameracontrolbox import CameraControlBox  # noqa: E402
-from ui.filenametemplatedialog import FilenameTemplateDialog  # noqa: E402
+from photosuite.camera.camera import Camera  # noqa: E402
+from photosuite.camera.gphoto2driver import GPhoto2Driver  # noqa: E402
 
-from camera.camera import Camera  # noqa: E402
-from camera.gphoto2driver import GPhoto2Driver  # noqa: E402
-from util.formatter import FilenameFormatter  # noqa: E402
+from photosuite.util.formatter import FilenameFormatter  # noqa: E402
+from photosuite.util.phexif import ExifTool  # noqa: E402
 
 # pylint: enable=wrong-import-position
 

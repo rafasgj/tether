@@ -19,12 +19,11 @@
 
 from typing import Any
 
-from util.formatter import FilenameFormatter
-from camera.util.optionlistmodel import OptionListModel
+from photosuite.util.formatter import FilenameFormatter
 
-from camera.errors import CameraError
-
-from camera.cameradriver import CameraDriver
+from photosuite.camera.util.optionlistmodel import OptionListModel
+from photosuite.camera.errors import CameraError
+from photosuite.camera.cameradriver import CameraDriver
 
 
 class Camera:

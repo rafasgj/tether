@@ -1,6 +1,6 @@
 """Camera settings models."""
 
-from camera.util.notify import Notifiable
+from photosuite.camera.util.notify import Notifiable
 
 
 class OptionListModel(Notifiable):

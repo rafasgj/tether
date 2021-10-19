@@ -20,7 +20,7 @@
 import io
 import gphoto2  # pylint: disable=import-error
 
-from camera.cameradriver import CameraDriver
+from photosuite.camera.cameradriver import CameraDriver
 
 
 class GPhoto2Error(Exception):
