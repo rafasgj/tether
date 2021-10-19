@@ -15,22 +15,22 @@ class Camera:
 
     properties = {
         "config": [
-            'focusmode',
-            'drivemode',
-            'imageformat',
-            'meteringmode',
-            'shutterspeed',
-            'aperture',
-            'iso',
-            'whitebalance'
+            "focusmode",
+            "drivemode",
+            "imageformat",
+            "meteringmode",
+            "shutterspeed",
+            "aperture",
+            "iso",
+            "whitebalance",
         ],
         "readonly": [
-            'shuttercounter',
-            'lensname',
-            'cameramodel',
-            'serialnumber',
-            'batterylevel'
-        ]
+            "shuttercounter",
+            "lensname",
+            "cameramodel",
+            "serialnumber",
+            "batterylevel",
+        ],
     }
 
     def __init__(self, camera_driver: CameraDriver, **options):
@@ -72,7 +72,7 @@ class Camera:
 
     def __getattr__(self, name: str) -> Any:
         """Overide 'getters' to easily deal with camera properties."""
-        props = Camera.properties['config'] + Camera.properties['readonly']
+        props = Camera.properties["config"] + Camera.properties["readonly"]
         if name in props:
             try:
                 value = self.__cam.get_value_for(name)

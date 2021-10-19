@@ -31,24 +31,24 @@ class FilenameFormatter:
     def __init__(self, rename_rule="IMG_{seq:04}.{EXT}", **kwargs):
         """Initialize filename formater."""
         self.format = rename_rule
-        self.counter = kwargs.get('initial', 0)
-        self.date = kwargs.get('date', datetime.datetime.now())
+        self.counter = kwargs.get("initial", 0)
+        self.date = kwargs.get("date", datetime.datetime.now())
         self.format_set = {
-            "custom_text": kwargs.get('text', ''),
+            "custom_text": kwargs.get("text", ""),
             "seq": 0,
             "filename": "",
             "ext": "",
-            "EXT": ""
+            "EXT": "",
         }
         self.__filldate()
 
     def __filldate(self):
         date = {
             "YYYY": self.date.strftime("%Y"),
-            "YY":  self.date.strftime("%y"),
-            "MM":  self.date.strftime("%m"),
-            "mon":  self.date.strftime("%b"),
-            "month":  self.date.strftime("%B"),
+            "YY": self.date.strftime("%y"),
+            "MM": self.date.strftime("%m"),
+            "mon": self.date.strftime("%b"),
+            "month": self.date.strftime("%B"),
             "DD": self.date.strftime("%d"),
         }
         self.format_set.update(date)
@@ -66,13 +66,13 @@ class FilenameFormatter:
     def filename(self, original, **kwargs):
         """Format the filename given the current rules."""
         self.counter += 1
-        self.set('seq', self.counter)
+        self.set("seq", self.counter)
         self.__filldate()
         (filename, ext) = os.path.splitext(original)
-        self.set('ext', ext[1:].lower())
-        self.set('EXT', ext[1:].upper())
-        self.set('filename', os.path.basename(filename))
-        self.set('original', os.path.basename(original))
+        self.set("ext", ext[1:].lower())
+        self.set("EXT", ext[1:].upper())
+        self.set("filename", os.path.basename(filename))
+        self.set("original", os.path.basename(original))
         for key, value in kwargs.items():
             self.set(key, value)
         return self.format.format(**self.format_set)

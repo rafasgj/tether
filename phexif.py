@@ -8,11 +8,17 @@ from subprocess import Popen, PIPE
 class ExifTool:
     """Encapsulate a running ExifTool process to retrieve metadata."""
 
-    COMMAND = ["exiftool",
-               "-stay_open", "True",
-               "-@", "-",
-               "-common_args",
-               "-G", "-n", "-b"]
+    COMMAND = [
+        "exiftool",
+        "-stay_open",
+        "True",
+        "-@",
+        "-",
+        "-common_args",
+        "-G",
+        "-n",
+        "-b",
+    ]
     STOP = ["-stay_open", "False"]
 
     def __init__(self):
@@ -23,9 +29,9 @@ class ExifTool:
     def start(self):
         """Initialize the Exiftool application."""
         with open(os.devnull, "w") as devnull:
-            self._process = Popen(ExifTool.COMMAND,
-                                  stdin=PIPE, stdout=PIPE,
-                                  stderr=devnull)
+            self._process = Popen(
+                ExifTool.COMMAND, stdin=PIPE, stdout=PIPE, stderr=devnull
+            )
             self._running = True
 
     def terminate(self):
@@ -43,7 +49,7 @@ class ExifTool:
         rd = b""
         lsz = -len(mark)
         fd = self._process.stdout.fileno()
-        while not rd[2 * lsz:].strip().endswith(mark):
+        while not rd[2 * lsz :].strip().endswith(mark):
             rd = os.read(fd, 4096)
             output += rd
         return output.strip()[:lsz]
@@ -59,7 +65,7 @@ class ExifTool:
         """Retrieve metadata in JSON format."""
         if not self._running:
             raise Exception("ExifTool must be running. Use 'start()' before.")
-        return json.loads(self._execute("-j", *files).decode('utf-8'))
+        return json.loads(self._execute("-j", *files).decode("utf-8"))
 
     def get_image_preview(self, *files):
         """Retrieve preview images in base64."""
@@ -70,7 +76,7 @@ class ExifTool:
         if self._running:
             params = [i for subl in args for i in subl]
             data = "%s\n" % "\n".join(params)
-            self._process.stdin.write(bytes(data.encode('utf-8')))
+            self._process.stdin.write(bytes(data.encode("utf-8")))
             self._process.stdin.flush()
 
     def __exit__(self, exc_type, exc_val, exc_tb):

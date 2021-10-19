@@ -1,6 +1,8 @@
 """Create a filename template dialog."""
 
-import gi; gi.require_version('Gtk', '3.0')  # noqa: E702
+import gi
+
+gi.require_version("Gtk", "3.0")  # noqa: E702
 from gi.repository import Gtk
 
 """
@@ -19,12 +21,17 @@ class FilenameTemplateDialog(Gtk.Dialog):
 
     def __init__(self, format="", *args, **kwargs):
         """Initialize the dialog."""
-        Gtk.Dialog.__init__(self, *args, **{k: kwargs[k] for k in kwargs
-                                            if k not in ['custom_strings']})
+        Gtk.Dialog.__init__(
+            self,
+            *args,
+            **{k: kwargs[k] for k in kwargs if k not in ["custom_strings"]},
+        )
         self.set_size_request(*(450, 300))
         self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK,
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OK,
+            Gtk.ResponseType.OK,
         )
         self.entries = {}
         #
@@ -73,7 +80,7 @@ class FilenameTemplateDialog(Gtk.Dialog):
         flowbox = self.__create_flow_box("Filename", file_strings)
         self.box.pack_start(flowbox, False, False, 0)
         #
-        custom_strings = kwargs.get('custom_strings', None)
+        custom_strings = kwargs.get("custom_strings", None)
         if custom_strings is not None:
             flowbox = self.__create_flow_box("Custom", custom_strings)
             self.box.pack_start(flowbox, False, False, 0)
@@ -124,7 +131,7 @@ class FilenameTemplateDialog(Gtk.Dialog):
 
         button = Gtk.Button(label="Insert")
         text_to_add = "{{{}}}".format(field)
-        button.connect('clicked', self.__add_text, self.entry, text_to_add)
+        button.connect("clicked", self.__add_text, self.entry, text_to_add)
         sbox.pack_start(button, False, False, 0)
         self.box.pack_start(sbox, False, False, 0)
 
@@ -142,7 +149,7 @@ class FilenameTemplateDialog(Gtk.Dialog):
         flowbox.set_homogeneous(False)
         for text, insert in itemlist:
             button = Gtk.Button(label=text)
-            button.connect('clicked', self.__add_text, self.entry, insert)
+            button.connect("clicked", self.__add_text, self.entry, insert)
             flowbox.add(button)
         sbox.pack_start(flowbox, False, False, 0)
         return iframe

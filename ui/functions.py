@@ -7,16 +7,16 @@ def label_with_character_size(size):
     """Create a label with a size defined by the number of characters."""
     label = Gtk.Label()
     # TODO: this 4-line hack computes the alleged max label size.
-    sz = Gtk.Label(label="W"*size)
+    sz = Gtk.Label(label="W" * size)
     sz.show()
     sz = sz.size_request()
     label.set_size_request(sz.width, sz.height)
     return label
 
 
-def button_with_icon_text(icon, text,
-                          orientation=Gtk.Orientation.HORIZONTAL,
-                          size=Gtk.IconSize.BUTTON):
+def button_with_icon_text(
+    icon, text, orientation=Gtk.Orientation.HORIZONTAL, size=Gtk.IconSize.BUTTON
+):
     """Create a butto with icon and text."""
     button_box = Gtk.Box(orientation=orientation, spacing=3)
     button_box.set_homogeneous(False)

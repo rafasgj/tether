@@ -9,7 +9,7 @@ __params = rawpy.Params(
     fbdd_noise_reduction=rawpy.FBDDNoiseReductionMode.Off,  # Light, Full
     output_color=rawpy.ColorSpace.sRGB,  # Adobe, ProPhoto, raw, Wide, XYZ
     output_bps=8,  # 16
-    exp_shift=0.5,   # linear: 0.25 = -2 stops, 8 = +3 stops.
+    exp_shift=0.5,  # linear: 0.25 = -2 stops, 8 = +3 stops.
     user_sat=2000,
 )
 
@@ -18,7 +18,7 @@ def image_from_raw(filename, params=__params):
     """Create a nem Image from a RAW file."""
     with rawpy.imread(filename) as raw:
         rgb = raw.postprocess(params)
-        return Image.fromarray(rgb, 'RGB')
+        return Image.fromarray(rgb, "RGB")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 from gi.repository import Gtk
 from .optionselector import OptionSelector
+
 # from .listcombobox import ListComboBox
 # from .functions import label_with_character_size
 
@@ -11,8 +12,9 @@ class CameraControlBox(Gtk.Box):
 
     def __init__(self, camera, cb=None):
         """Initialize the UI composed component."""
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL,
-                         spacing=10)
+        Gtk.Box.__init__(
+            self, orientation=Gtk.Orientation.HORIZONTAL, spacing=10
+        )
         self.set_homogeneous(False)
         self.camera = camera
         # # Combo settings
@@ -34,7 +36,7 @@ class CameraControlBox(Gtk.Box):
             self.__create_camera_properties_box(model, lensname),
             False,
             False,
-            0
+            0,
         )
 
     def __create_camera_settings_box(self, camera):

@@ -6,7 +6,9 @@ import io
 from PIL import Image
 from magic import Magic
 
-import gi; gi.require_version('Gtk', '3.0')  # noqa:E702 # pylint:disable=C0321
+import gi
+
+gi.require_version("Gtk", "3.0")  # noqa:E702 # pylint:disable=C0321
 from gi.repository import Gtk, Gdk, GdkPixbuf
 
 from phexif import ExifTool
@@ -33,10 +35,10 @@ capture_directory = os.getcwd()
 def picture_taken(camera, filename):
     """Handle new frame signal."""
     global last_image
-    pil = ('image/jpeg', 'image/tiff', 'image/gif', 'image/png')
+    pil = ("image/jpeg", "image/tiff", "image/gif", "image/png")
     mime_type = mime.from_file(filename)
     metadata = exif.get_metadata(filename)[0]
-    key = 'EXIF:Orientation'
+    key = "EXIF:Orientation"
     rotation = [0, 0, 0, 180, 0, 0, -90, 0, 90]
     orientation = rotation[int(metadata[key])] if key in metadata else 0
     if mime_type in pil:
@@ -59,12 +61,13 @@ def create_frame(size=(640, 80)):
     sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
     butns = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
     button = button_with_icon_text("insert-text", "Naming Rule")
-    button.connect('clicked', update_formatter)
+    button.connect("clicked", update_formatter)
     butns.pack_start(button, False, False, 0)
     action = Gtk.FileChooserAction.SELECT_FOLDER
     button = Gtk.FileChooserButton(title="Directory", action=action)
-    button.connect('file_set',
-                   lambda b: camera.set_capture_directory(b.get_filename()))
+    button.connect(
+        "file_set", lambda b: camera.set_capture_directory(b.get_filename())
+    )
     button.set_create_folders(True)
     button.set_current_folder(capture_directory)
     butns.pack_end(button, False, False, 0)
@@ -73,11 +76,11 @@ def create_frame(size=(640, 80)):
     sub.pack_start(camera_control, False, False, 0)
     button = button_with_icon_text(
         "camera-photo",
-        'Shot!',
+        "Shot!",
         Gtk.Orientation.VERTICAL,
-        size=Gtk.IconSize.DIALOG
+        size=Gtk.IconSize.DIALOG,
     )
-    button.connect('clicked', grab_picture)
+    button.connect("clicked", grab_picture)
     sub.pack_end(button, False, False, 0)
     main.pack_start(sub, False, False, 0)
     frame.add(main)
@@ -92,8 +95,9 @@ def grab_picture(button):
 
 def update_formatter(self, *args):
     """Update filename formatter."""
-    dialog = FilenameTemplateDialog(format=filename_formatter.format,
-                                    transient_for=None)
+    dialog = FilenameTemplateDialog(
+        format=filename_formatter.format, transient_for=None
+    )
     if dialog.run() == Gtk.ResponseType.OK:
         filename_formatter.add_keys(dialog.user_defined)
         filename_formatter.format = dialog.filename_template
@@ -139,7 +143,7 @@ def create_image_window():
     img_ui = Gtk.DrawingArea()
     img_ui.set_hexpand(True)
     img_ui.set_vexpand(True)
-    img_ui.connect('draw', update_image_ui)
+    img_ui.connect("draw", update_image_ui)
     img_win.set_size_request(int(width * 0.75), int(height * 0.75))
     img_win.add(img_ui)
     img_win.move(0, 0)
@@ -154,8 +158,8 @@ def update_image_ui(drawing_area, cairo_context):
         iw, ih = data.get_width(), data.get_height()
         w = drawing_area.get_allocated_width()
         h = drawing_area.get_allocated_height()
-        r = min(w/iw, h/ih)
-        rw, rh = int(iw*r), int(ih*r)
+        r = min(w / iw, h / ih)
+        rw, rh = int(iw * r), int(ih * r)
         if w < iw or h < ih:
             interp = GdkPixbuf.InterpType.BILINEAR
             data = GdkPixbuf.Pixbuf.scale_simple(data, rw, rh, interp)
@@ -163,8 +167,8 @@ def update_image_ui(drawing_area, cairo_context):
             rw, rh = iw, ih
         x, y = 0, 0
         if rw < w or rh < h:
-            x = w//2 - rw//2
-            y = h//2 - rh//2
+            x = w // 2 - rw // 2
+            y = h // 2 - rh // 2
         Gdk.cairo_set_source_pixbuf(cairo_context, data, x, y)
         cairo_context.paint()
     return False
@@ -172,11 +176,14 @@ def update_image_ui(drawing_area, cairo_context):
 
 def display_select_folder_dialog(title, parent=None):
     """Create a dialog to select a folder."""
-    buttons = ((Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL),
-               (Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+    buttons = (
+        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL),
+        (Gtk.STOCK_OPEN, Gtk.ResponseType.OK),
+    )
     action = Gtk.FileChooserAction.SELECT_FOLDER
-    dialog = Gtk.FileChooserDialog(title=title, action=action,
-                                   transient_for=parent)
+    dialog = Gtk.FileChooserDialog(
+        title=title, action=action, transient_for=parent
+    )
     for button in buttons:
         dialog.add_button(*button)
     dialog.set_local_only(True)
@@ -200,7 +207,7 @@ def change_target_directory(*args):
 
 def set_application_theme():
     """Load application theme CSS."""
-    css = b''
+    css = b""
     css_provider = Gtk.CssProvider()
     css_provider.load_from_data(css)
     context = Gtk.StyleContext()
@@ -237,5 +244,6 @@ if __name__ == "__main__":
             Gtk.main()
     except Exception as ex:
         import traceback
+
         msg = "Is the camera correctly attached and turned on?"
         print("%s\n%s\n%s" % (traceback.format_exc(), ex, msg))
