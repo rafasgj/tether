@@ -15,8 +15,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-"""Initializes camera module."""
-
-# flake8: noqa
-
-from .camera import Camera
+"""Camera module."""
