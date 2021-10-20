@@ -18,7 +18,7 @@
 """Define the UI to control camera settings."""
 
 from gi.repository import Gtk
-from .optionselector import OptionSelector
+from .optionselector import OptionSelector  # pylint: disable=import-error
 
 # from .listcombobox import ListComboBox
 # from .functions import label_with_character_size

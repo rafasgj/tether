@@ -21,9 +21,12 @@ from typing import Any
 
 from photosuite.util.formatter import FilenameFormatter
 
+# pylint: disable=import-error
 from photosuite.camera.util.optionlistmodel import OptionListModel
 from photosuite.camera.errors import CameraError
 from photosuite.camera.cameradriver import CameraDriver
+
+# pylint: enable=import-error
 
 
 class Camera:

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 
 
-class Notifiable:
+class Notifiable:  # pylint: disable=too-few-public-methods
     """Implement a basic signaling mechanism."""
 
     def __init__(self, connectors=None):
@@ -22,7 +22,7 @@ class Notifiable:
         for connector in connectors:
             self.__pins[connector] = set()
 
-    def connect(self, connector: str, callable: Callable) -> None:
+    def connect(self, connector: str, call: Callable) -> None:
         """
         Register a callback to a notification connector.
 
@@ -30,15 +30,15 @@ class Notifiable:
         ----------
         connector: string
             The signal name to connect. Any of 'previous', 'next', 'change'.
-        callable: Callable
+        call: Callable
             The callable that will be called upon signal notification.
 
         """
         if connector not in self.__pins:
             raise ValueError(f"Connector not found: {connector}")
-        self.__pins[connector].add(callable)
+        self.__pins[connector].add(call)
 
-    def _notify(self, connectors: list[str]) -> None:
+    def _notify(self, connectors) -> None:
         """
         Notify all receivers registered for the connectors.
 
@@ -51,5 +51,5 @@ class Notifiable:
 
         """
         for connector in connectors:
-            for callable in self.__pins[connector]:
-                callable(self)
+            for call in self.__pins[connector]:
+                call(self)

@@ -19,7 +19,7 @@
 
 from gi.repository import Gtk
 
-from .functions import label_with_character_size
+from .functions import label_with_character_size  # pylint: disable=import-error
 
 
 class OptionSelector(Gtk.Box):

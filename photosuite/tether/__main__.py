@@ -27,7 +27,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")  # noqa:E702 # pylint:disable=C0321
 
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, import-error
 from gi.repository import Gtk, Gdk, GdkPixbuf  # noqa: E402
 
 from photosuite.ui.functions import button_with_icon_text  # noqa: E402
@@ -40,7 +40,7 @@ from photosuite.camera.gphoto2driver import GPhoto2Driver  # noqa: E402
 from photosuite.util.formatter import FilenameFormatter  # noqa: E402
 from photosuite.util.phexif import ExifTool  # noqa: E402
 
-# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-position, import-error
 
 
 # Hold the last image captured
@@ -274,4 +274,3 @@ if __name__ == "__main__":
         MSG = "Is the camera correctly attached and turned on?"
         # pylint: disable=consider-using-f-string
         print("%s\n%s\n%s" % (traceback.format_exc(), ex, MSG))
-        # pylint: enable=consider-using-f-string
