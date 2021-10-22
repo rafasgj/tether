@@ -10,19 +10,20 @@ If something seems to be wrong, it probably is, but check
 
 ### Libgphoto2
 
-Gphoto2 is composed of a command-line utility and a shared library with
-functions that allow controlling a camera connected to the computer. It
-must be installed, before the Python modules. Use the latest available
-for your package manager. You will also need the development files for
-libgphoto2 (libgphoto2-devel or libgphoto2-dev) and the Python
-header files available (from package python3-devel or python3-dev).
+[Gphoto2](https://gphoto.org) is composed of a command-line utility
+and a shared library with functions that allow controlling a camera
+connected to the computer. It must be installed, before the Python
+modules. Use the latest available for your package manager. You will
+also need the development files for libgphoto2 (libgphoto2-devel or
+libgphoto2-dev) and the Python header files available (from package
+python3-devel or python3-dev).
 
 ### Python Modules
 
-Tether needs **Python 3**, which is available on almost every Linux
-distibution, can be easily installed on Windows, and might require the
+Tether requires **Python 3**, which is available on almost every Linux
+distribution, can be easily installed on Windows, and might require the
 use of a package manager like [Homebrew](https://brew.sh) if you have
-an older version of macOS (like High Sierra).
+any, but the most recent, version of macOS.
 
 Pure Python dependencies may be installed with PIP, by issuing
 
@@ -30,8 +31,8 @@ Pure Python dependencies may be installed with PIP, by issuing
 python3 -m pip install -U -r requirements.txt
 ```
 
-You might need to change 'python3' to 'python' depending on your
-operating system and/or installation.
+You might need to change from 'python3' to 'python' depending on your
+operating system and/or configuration.
 
 ### GTK+ 3
 
@@ -47,14 +48,7 @@ The following development packages are required to install PyGObject:
 	* gobject-introspection
 	* cairo-gobject
 
-Under macOS, you should use Homebrew to install it. Unfortunatelly,
-I don't use Windows and have no idea on how to install GTK+ on it.
-
-### LibRaw
-
-If your camera provides RAW files, you will want to use it to capture the
-images, and this will require that you have LibRaw installed. Anything,
-from version 0.18 will do, but use the most recent available.
+For macOS see [MACOS.md](MACOS.md)
 
 ### LibMagic
 
@@ -67,9 +61,9 @@ machine, you might need to install it under other operating systems.
 Phil Harvey's ExifTool is an amazing tool to deal with image EXIF
 metadata, and is used to extract embedded images from RAW files.
 This is much faster than applying a demosaic algorithm to the RAW
-files, and provide a similar view than the camera LCD monitor.
+files, and provide a similar view as in the camera LCD monitor.
 
-### Indirect Dependencies
+### Optional Dependencies
 
 This software has some dependencies that might help on its use, but are
 not mandatory. These dependencies often show as optional dependencies of
