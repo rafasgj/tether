@@ -6,6 +6,51 @@ If something seems to be wrong, it probably is, but check
 [ISSUES.md](ISSUES.md) before reporting
 [on Github](https://github.com/rafasgj/tether/issues).
 
+
+## Installation and Usage
+
+As Tether is currently considered in _alpha_ stage of development,
+you can only run it by getting a copy of this repository either
+through Git or downloading a zip file. Both can be obtained from
+[https://github.com/rafasgj/tether](https://github.com/rafasgj/tether)
+
+Once you downloaded it, it is suggested that you try it using a Python
+virtual environment:
+
+```
+$ python3 -m venv .venv
+$ . .venv/bin/activate
+```
+
+Install it with `pip`:
+
+```
+$ pip install .[deps]
+```
+
+If everything went fine, you can start it with:
+
+```
+$ python -m photosuite.tether
+```
+
+### Displaying Captured Images
+
+Images captured by `tether` are just saved to the selected directory.
+You may use `utils/image_monitor.py` to display the last captured
+image:
+
+```
+$ pip install -e .[deps]
+$ pip install -r utils/requirements.txt
+$ python utils/image_monitor.py
+```
+
+You may pass a directory path to `image_monitor` so that directory is
+the one that will be monitored, and can be used as the target directory
+in `tether`.
+
+
 ## Dependencies
 
 ### Libgphoto2
