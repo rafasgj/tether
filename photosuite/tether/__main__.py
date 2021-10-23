@@ -169,13 +169,76 @@ def start_gui():
     return window
 
 
+def camera_select(camera_list):
+    """Display image to select camera from a list."""
+
+    def on_ok(_):
+        """Set the selected camera."""
+        nonlocal selected, combo
+        tree_iter = combo.get_active_iter()
+        model = combo.get_model()
+        selected = model[tree_iter][1]
+        Gtk.main_quit()
+
+    def update_combo(camdata):
+        """Update camera list."""
+        nonlocal combo
+        data = Gtk.ListStore(str, str)
+        for cam in camdata:
+            data.append(cam)
+        if not combo:
+            combo = Gtk.ComboBox.new_with_model(data)
+            combo.set_active(0)
+            renderer_text = Gtk.CellRendererText()
+            combo.pack_start(renderer_text, True)
+            combo.add_attribute(renderer_text, "text", 0)
+        else:
+            combo.set_model(data)
+            combo.set_active(0)
+
+    def refresh(_):
+        update_combo(GPhoto2Driver.autodetect())
+
+    combo = None
+    selected = None
+    set_application_theme()
+    update_combo(camera_list)
+    window = Gtk.Window()
+    window.set_title("Camera")
+    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+    vbox.set_homogeneous(True)
+    window.add(vbox)
+    label = Gtk.Label(label="Select Camera")
+    vbox.pack_start(label, True, True, 0)
+    vbox.pack_start(combo, True, True, 0)
+    bok = Gtk.Button(label="Ok")
+    bok.connect("clicked", on_ok)
+    brefresh = Gtk.Button(label="Refresh")
+    brefresh.connect("clicked", refresh)
+    bcancel = Gtk.Button(label="Cancel")
+    bcancel.connect("clicked", Gtk.main_quit)
+    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+    hbox.set_homogeneous(True)
+    hbox.pack_start(bcancel, True, True, 5)
+    hbox.pack_start(bok, True, True, 5)
+    hbox.pack_start(brefresh, True, True, 5)
+    vbox.pack_start(hbox, False, False, 5)
+    window.show_all()
+    window.connect("destroy", Gtk.main_quit)
+    Gtk.main()
+    return selected
+
+
 if __name__ == "__main__":
     try:
-        cameras = [p for (c, p) in GPhoto2Driver.autodetect()]
-        if not cameras:
-            print("No camera found.")
+        cameras = GPhoto2Driver.autodetect()
+        if len(cameras) == 1:
+            port = cameras[0][1]
         else:
-            port = cameras[0]
+            port = camera_select(cameras)  # pylint: disable=invalid-name
+        if not port:
+            print("No camera found or selected.")
+        else:
             camera = Camera(GPhoto2Driver(port))
             win = start_gui()
             Gtk.main()
