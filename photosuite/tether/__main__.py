@@ -18,17 +18,13 @@
 """Use a camera tethered to the device."""
 
 import os
-import io
-
-from PIL import Image
-from magic import Magic
 
 import gi
 
 gi.require_version("Gtk", "3.0")  # noqa:E702 # pylint:disable=C0321
 
 # pylint: disable=wrong-import-position, import-error
-from gi.repository import Gtk, Gdk, GdkPixbuf  # noqa: E402
+from gi.repository import Gtk, Gdk  # noqa: E402
 
 from photosuite.ui.functions import button_with_icon_text  # noqa: E402
 from photosuite.ui.cameracontrolbox import CameraControlBox  # noqa: E402
@@ -38,38 +34,12 @@ from photosuite.camera.camera import Camera  # noqa: E402
 from photosuite.camera.gphoto2driver import GPhoto2Driver  # noqa: E402
 
 from photosuite.util.formatter import FilenameFormatter  # noqa: E402
-from photosuite.util.phexif import ExifTool  # noqa: E402
 
 # pylint: enable=wrong-import-position, import-error
 
 
-# Hold the last image captured
-last_image = None  # pylint: disable=invalid-name
-img_win = None  # pylint: disable=invalid-name
-
 filename_formatter = FilenameFormatter()
-mime = Magic(True)
-exif = ExifTool()
-exif.start()
 capture_directory = os.getcwd()
-
-
-def picture_taken(_camera, fname):
-    """Handle new frame signal."""
-    global last_image  # pylint: disable=invalid-name,global-statement
-    pil = ("image/jpeg", "image/tiff", "image/gif", "image/png")
-    mime_type = mime.from_file(fname)  # pylint: disable=no-member
-    metadata = exif.get_metadata(fname)[0]
-    key = "EXIF:Orientation"
-    rotation = [0, 0, 0, 180, 0, 0, -90, 0, 90]
-    orientation = rotation[int(metadata[key])] if key in metadata else 0
-    if mime_type in pil:
-        last_image = Image.open(fname)
-    else:
-        reader = io.BytesIO(exif.get_image_preview(fname))
-        last_image = Image.open(reader)
-    last_image = last_image.rotate(orientation, expand=True)
-    img_win.queue_draw()
 
 
 def create_frame(size=(640, 80)):
@@ -112,8 +82,10 @@ def create_frame(size=(640, 80)):
 def grab_picture(_sender):
     """Format filename and grab picture from camera."""
     filename = filename_formatter.filename("image.cr2")
-    filename = camera.grab_frame(filename=filename)
-    picture_taken(camera, filename)
+    camera.grab_frame(filename=filename)
+
+
+#     picture_taken(camera, filename)
 
 
 def update_formatter(_sender, *_args):
@@ -125,22 +97,6 @@ def update_formatter(_sender, *_args):
         filename_formatter.add_keys(dialog.user_defined)
         filename_formatter.format = dialog.filename_template
     dialog.destroy()
-
-
-def get_image_pixbuf(image):
-    """Given the image, get its contents as a GdkPixbuf."""
-    if isinstance(image, Image.Image):
-        with io.BytesIO() as data:
-            image.save(data, "jpeg")
-            loader = GdkPixbuf.PixbufLoader.new_with_type("jpeg")
-            loader.write(data.getvalue())
-            data = loader.get_pixbuf()
-            loader.close()
-    elif isinstance(image, Gtk.Image):
-        data = image.get_pixbuf()
-    else:
-        raise Exception("Internal Error: Invalid image object.")
-    return data
 
 
 def get_screen_dimension():
@@ -155,50 +111,6 @@ def get_screen_dimension():
     height = max(r.y + r.height for r in geoms) - min(r.y for r in geoms)
 
     return width, height
-
-
-def create_image_window():
-    """Create window to display image."""
-    global img_win  # pylint: disable=invalid-name, global-statement
-    width, height = get_screen_dimension()
-    img_win = Gtk.Window()
-    img_win.connect("destroy", Gtk.main_quit)
-    img_win.set_position(Gtk.WindowPosition.CENTER)
-    img_win.set_title("Picture Maker")
-    img_ui = Gtk.DrawingArea()
-    img_ui.set_hexpand(True)
-    img_ui.set_vexpand(True)
-    img_ui.connect("draw", update_image_ui)
-    img_win.set_size_request(int(width * 0.75), int(height * 0.75))
-    img_win.add(img_ui)
-    img_win.move(0, 0)
-    img_win.show_all()
-
-
-def update_image_ui(drawing_area, cairo_context):
-    """Update image displayed."""
-    if last_image is not None:
-        # pylint: disable=invalid-name
-        img_win.activate()
-        data = get_image_pixbuf(last_image)
-        iw, ih = data.get_width(), data.get_height()
-        w = drawing_area.get_allocated_width()
-        h = drawing_area.get_allocated_height()
-        r = min(w / iw, h / ih)
-        rw, rh = int(iw * r), int(ih * r)
-        if w < iw or h < ih:
-            interp = GdkPixbuf.InterpType.BILINEAR
-            data = GdkPixbuf.Pixbuf.scale_simple(data, rw, rh, interp)
-        else:
-            rw, rh = iw, ih
-        x, y = 0, 0
-        if rw < w or rh < h:
-            x = w // 2 - rw // 2
-            y = h // 2 - rh // 2
-        Gdk.cairo_set_source_pixbuf(cairo_context, data, x, y)
-        cairo_context.paint()
-        # pylint: enable=invalid-name
-    return False
 
 
 def display_select_folder_dialog(title, parent=None):
@@ -245,9 +157,7 @@ def set_application_theme():
 def start_gui():
     """Start graphical interface."""
     set_application_theme()
-    create_image_window()
     window = Gtk.Window()
-    window.set_decorated(False)
     width, height = get_screen_dimension()
     window.move(width, height)
     window.connect("destroy", Gtk.main_quit)
