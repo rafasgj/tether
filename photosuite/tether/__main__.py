@@ -158,6 +158,7 @@ def start_gui():
     """Start graphical interface."""
     set_application_theme()
     window = Gtk.Window()
+    window.set_title("Tether")
     width, height = get_screen_dimension()
     window.move(width, height)
     window.connect("destroy", Gtk.main_quit)
