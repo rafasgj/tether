@@ -18,6 +18,7 @@
 """Use a camera tethered to the device."""
 
 import os
+import traceback
 
 import gi
 
@@ -42,13 +43,13 @@ filename_formatter = FilenameFormatter()
 capture_directory = os.getcwd()
 
 
-def create_frame(size=(640, 80)):
+def create_frame(camera, size=(640, 80)):
     """Create the main window frame."""
     frame = Gtk.Frame()
     frame.set_size_request(*size)
-    main = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-    main.set_homogeneous(False)
-    main.set_border_width(10)
+    layout = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    layout.set_homogeneous(False)
+    layout.set_border_width(10)
 
     sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
     butns = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -73,14 +74,14 @@ def create_frame(size=(640, 80)):
         Gtk.Orientation.VERTICAL,
         size=Gtk.IconSize.DIALOG,
     )
-    button.connect("clicked", grab_picture)
+    button.connect("clicked", grab_picture, camera)
     sub.pack_end(button, False, False, 0)
-    main.pack_start(sub, False, False, 0)
-    frame.add(main)
+    layout.pack_start(sub, False, False, 0)
+    frame.add(layout)
     return frame
 
 
-def grab_picture(_sender):
+def grab_picture(_sender, camera):
     """Format filename and grab picture from camera."""
     filename = filename_formatter.filename("image.cr2")
     camera.grab_frame(filename=os.path.join(capture_directory, filename))
@@ -128,7 +129,7 @@ def set_application_theme():
     context.add_provider_for_screen(screen, css_provider, priority)
 
 
-def start_gui():
+def start_gui(camera):
     """Start graphical interface."""
     set_application_theme()
     window = Gtk.Window()
@@ -136,7 +137,7 @@ def start_gui():
     width, height = get_screen_dimension()
     window.move(width, height)
     window.connect("destroy", Gtk.main_quit)
-    window.add(create_frame())
+    window.add(create_frame(camera))
     window.show_all()
     window.set_keep_above(True)
 
@@ -203,22 +204,20 @@ def camera_select(camera_list):
     return selected
 
 
-if __name__ == "__main__":
+def main():
+    """Tether entry point."""
     try:
         cameras = GPhoto2Driver.autodetect()
-        if len(cameras) == 1:
-            port = cameras[0][1]
-        else:
-            port = camera_select(cameras)  # pylint: disable=invalid-name
+        port = cameras[0][1] if len(cameras) == 1 else camera_select(cameras)
         if not port:
             print("No camera found or selected.")
         else:
-            camera = Camera(GPhoto2Driver(port))
-            win = start_gui()
+            start_gui(Camera(GPhoto2Driver(port)))
             Gtk.main()
     except Exception as ex:  # pylint: disable=broad-except
-        import traceback
+        msg = "Is the camera correctly attached and turned on?"
+        print(f"{traceback.format_exc()}\n{ex}\n{msg}")
 
-        MSG = "Is the camera correctly attached and turned on?"
-        # pylint: disable=consider-using-f-string
-        print("%s\n%s\n%s" % (traceback.format_exc(), ex, MSG))
+
+if __name__ == "__main__":
+    main()

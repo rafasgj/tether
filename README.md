@@ -25,13 +25,13 @@ $ . .venv/bin/activate
 Install it with `pip`:
 
 ```
-$ pip install .[deps]
+$ pip install -e .[deps]
 ```
 
 If everything went fine, you can start it with:
 
 ```
-$ python -m photosuite.tether
+$ tether
 ```
 
 ### Displaying Captured Images
