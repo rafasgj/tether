@@ -43,7 +43,7 @@ filename_formatter = FilenameFormatter()
 capture_directory = os.getcwd()
 
 
-def create_frame(camera, size=(640, 80)):
+def create_frame(camera, size=(120, 200)):
     """Create the main window frame."""
     frame = Gtk.Frame()
     frame.set_size_request(*size)
@@ -51,7 +51,7 @@ def create_frame(camera, size=(640, 80)):
     layout.set_homogeneous(False)
     layout.set_border_width(10)
 
-    sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+    sub = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
     butns = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
     button = button_with_icon_text("insert-text", "Naming Rule")
     button.connect("clicked", update_formatter)
@@ -68,6 +68,8 @@ def create_frame(camera, size=(640, 80)):
     sub.pack_start(butns, False, False, 0)
     camera_control = CameraControlBox(camera, camera.grab_frame)
     sub.pack_start(camera_control, False, False, 0)
+    bbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+    bbox.set_homogeneous(True)
     button = button_with_icon_text(
         "camera-photo",
         "Shot!",
@@ -75,7 +77,15 @@ def create_frame(camera, size=(640, 80)):
         size=Gtk.IconSize.DIALOG,
     )
     button.connect("clicked", grab_picture, camera)
-    sub.pack_end(button, False, False, 0)
+    bbox.pack_start(button, False, False, 0)
+    button = button_with_icon_text(
+        "preferences-desktop",
+        "Settings",
+        Gtk.Orientation.VERTICAL,
+        size=Gtk.IconSize.DIALOG,
+    )
+    bbox.pack_start(button, False, False, 0)
+    sub.pack_end(bbox, False, False, 0)
     layout.pack_start(sub, False, False, 0)
     frame.add(layout)
     return frame
@@ -134,6 +144,7 @@ def start_gui(camera):
     set_application_theme()
     window = Gtk.Window()
     window.set_title("Tether")
+    window.set_resizable(False)
     width, height = get_screen_dimension()
     window.move(width, height)
     window.connect("destroy", Gtk.main_quit)
