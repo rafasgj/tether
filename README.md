@@ -13,7 +13,6 @@ As Tether is currently considered in _alpha_ stage of development,
 you can only run it by getting a copy of this repository either
 through Git or downloading a zip file. Both can be obtained from
 [https://github.com/rafasgj/tether](https://github.com/rafasgj/tether)
-
 Once you downloaded it, it is suggested that you try it using a Python
 virtual environment:
 
