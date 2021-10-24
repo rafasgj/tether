@@ -58,8 +58,9 @@ def create_frame(size=(640, 80)):
     action = Gtk.FileChooserAction.SELECT_FOLDER
     button = Gtk.FileChooserButton(title="Directory", action=action)
     button.connect(
-        "file_set", lambda b: camera.set_capture_directory(b.get_filename())
+        "file_set", lambda b: change_target_directory(b.get_filename())
     )
+    button.set_local_only(True)
     button.set_create_folders(True)
     button.set_current_folder(capture_directory)
     butns.pack_end(button, False, False, 0)
@@ -82,10 +83,7 @@ def create_frame(size=(640, 80)):
 def grab_picture(_sender):
     """Format filename and grab picture from camera."""
     filename = filename_formatter.filename("image.cr2")
-    camera.grab_frame(filename=filename)
-
-
-#     picture_taken(camera, filename)
+    camera.grab_frame(filename=os.path.join(capture_directory, filename))
 
 
 def update_formatter(_sender, *_args):
@@ -113,34 +111,10 @@ def get_screen_dimension():
     return width, height
 
 
-def display_select_folder_dialog(title, parent=None):
-    """Create a dialog to select a folder."""
-    buttons = (
-        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL),
-        (Gtk.STOCK_OPEN, Gtk.ResponseType.OK),
-    )
-    action = Gtk.FileChooserAction.SELECT_FOLDER
-    dialog = Gtk.FileChooserDialog(
-        title=title, action=action, transient_for=parent
-    )
-    for button in buttons:
-        dialog.add_button(*button)
-    dialog.set_local_only(True)
-    dialog.set_create_folders(True)
-    dialog.set_current_folder(capture_directory)
-    try:
-        if dialog.run() == Gtk.ResponseType.OK:
-            return dialog.get_filename()
-    finally:
-        dialog.destroy()
-    return None
-
-
-def change_target_directory(*_args):
+def change_target_directory(newdir):
     """Ask user for the new capture directory."""
-    directory = display_select_folder_dialog("Select capture folder", win)
-    if directory:
-        camera.capture_directory = directory
+    global capture_directory
+    capture_directory = newdir or os.getcwd()
 
 
 def set_application_theme():
