@@ -113,7 +113,7 @@ def get_screen_dimension():
 
 def change_target_directory(newdir):
     """Ask user for the new capture directory."""
-    global capture_directory
+    global capture_directory  # pylint: disable=global-statement, invalid-name
     capture_directory = newdir or os.getcwd()
 
 
