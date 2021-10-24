@@ -83,18 +83,18 @@ def create_frame(camera, size=(640, 80)):
 
 def grab_picture(_sender, camera):
     """Format filename and grab picture from camera."""
-    filename = filename_formatter.filename("image.cr2")
+    filename = filename_formatter.get_filename("image.cr2")
     camera.grab_frame(filename=os.path.join(capture_directory, filename))
 
 
 def update_formatter(_sender, *_args):
     """Update filename formatter."""
     dialog = FilenameTemplateDialog(
-        format=filename_formatter.format, transient_for=None
+        format_string=filename_formatter.rename_rule, transient_for=None
     )
     if dialog.run() == Gtk.ResponseType.OK:  # pylint: disable=no-member
         filename_formatter.add_keys(dialog.user_defined)
-        filename_formatter.format = dialog.filename_template
+        filename_formatter.rename_rule = dialog.filename_template
     dialog.destroy()
 
 
