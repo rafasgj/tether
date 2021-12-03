@@ -18,25 +18,31 @@
 #
 
 linux_dependencies() {
+	# shellcheck disable=SC1091
 	. /etc/os-release
-	case $NAME in
+ 	case $NAME in
 		"Fedora")
 			gphoto="libgphoto2 libgphoto2-devel python3-devel"
 			gtk="cairo-devel cairo-gobject-devel"
 			gobject="gobject-introspection-devel"
 			exif="perl-Image-ExifTool"
+			# shellcheck disable=SC2086
 			dnf install $gphoto $gtk $exif $gobject
+		;;
+		*)
+			echo "Distribution not supported."
+			exit 1
 		;;
 	esac  # is ridiculous ;-)
 }
 
-if [ $EUID != 0 ]
+if [ "$(id -u)" != 0 ]
 then
 	echo "Must be executed with superuser priviledges."
 	exit 1
 fi
 
-os=`uname`
+os=$(uname)
 
 case $os in
 	"Linux")
