@@ -20,9 +20,6 @@
 from gi.repository import Gtk
 from .optionselector import OptionSelector  # pylint: disable=import-error
 
-# from .listcombobox import ListComboBox
-# from .functions import label_with_character_size
-
 
 class CameraControlBox(Gtk.Box):
     """Create box to control camera settings."""
