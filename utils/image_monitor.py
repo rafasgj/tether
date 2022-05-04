@@ -108,7 +108,6 @@ def create_image_window():
     _ui.connect("draw", update_image_ui)
     _win.set_size_request(int(width * 0.75), int(height * 0.75))
     _win.add(_ui)
-    _win.move(0, 0)
     _win.show_all()
     return _win
 
