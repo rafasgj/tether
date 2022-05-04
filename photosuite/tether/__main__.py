@@ -139,9 +139,8 @@ def set_application_theme():
     context.add_provider_for_screen(screen, css_provider, priority)
 
 
-def start_gui(camera):
+def tether_window(_sender, camera):
     """Start graphical interface."""
-    set_application_theme()
     window = Gtk.Window()
     window.set_title("Tether")
     window.set_resizable(False)
@@ -152,10 +151,8 @@ def start_gui(camera):
     window.show_all()
     window.set_keep_above(True)
 
-    return window
 
-
-def camera_select(camera_list):
+def camera_select():
     """Display image to select camera from a list."""
 
     def on_ok(_):
@@ -164,7 +161,7 @@ def camera_select(camera_list):
         tree_iter = combo.get_active_iter()
         model = combo.get_model()
         selected = model[tree_iter][1]
-        Gtk.main_quit()
+        window.close()
 
     def update_combo(camdata):
         """Update camera list."""
@@ -172,7 +169,7 @@ def camera_select(camera_list):
         data = Gtk.ListStore(str, str)
         for cam in camdata:
             data.append(cam)
-        if not combo:
+        if combo is None:
             combo = Gtk.ComboBox.new_with_model(data)
             combo.set_active(0)
             renderer_text = Gtk.CellRendererText()
@@ -187,44 +184,45 @@ def camera_select(camera_list):
 
     combo = None
     selected = None
-    set_application_theme()
-    update_combo(camera_list)
-    window = Gtk.Window()
-    window.set_title("Camera")
-    vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
-    vbox.set_homogeneous(True)
-    window.add(vbox)
-    label = Gtk.Label(label="Select Camera")
-    vbox.pack_start(label, True, True, 0)
-    vbox.pack_start(combo, True, True, 0)
-    bok = Gtk.Button(label="Ok")
-    bok.connect("clicked", on_ok)
-    brefresh = Gtk.Button(label="Refresh")
-    brefresh.connect("clicked", refresh)
-    bcancel = Gtk.Button(label="Cancel")
-    bcancel.connect("clicked", Gtk.main_quit)
-    hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-    hbox.set_homogeneous(True)
-    hbox.pack_start(bcancel, True, True, 5)
-    hbox.pack_start(bok, True, True, 5)
-    hbox.pack_start(brefresh, True, True, 5)
-    vbox.pack_start(hbox, False, False, 5)
-    window.show_all()
-    window.connect("destroy", Gtk.main_quit)
-    Gtk.main()
-    return selected
+
+    camera_list = GPhoto2Driver.autodetect()
+    if len(camera_list) == 1:
+        selected = camera_list[0][1]
+        tether_window(None, Camera(GPhoto2Driver(selected)))
+    else:
+        update_combo(camera_list)
+        window = Gtk.Window()
+        window.set_title("Camera")
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        vbox.set_homogeneous(True)
+        window.add(vbox)
+        label = Gtk.Label(label="Select Camera")
+        vbox.pack_start(label, True, True, 0)
+        vbox.pack_start(combo, True, True, 0)
+        bok = Gtk.Button(label="Ok")
+        bok.connect("clicked", on_ok)
+        brefresh = Gtk.Button(label="Refresh")
+        brefresh.connect("clicked", refresh)
+        bcancel = Gtk.Button(label="Cancel")
+        bcancel.connect("clicked", Gtk.main_quit)
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        hbox.set_homogeneous(True)
+        hbox.pack_start(bcancel, True, True, 5)
+        hbox.pack_start(bok, True, True, 5)
+        hbox.pack_start(brefresh, True, True, 5)
+        vbox.pack_start(hbox, False, False, 5)
+        window.show_all()
+        window.connect(
+            "destroy", tether_window, Camera(GPhoto2Driver(selected))
+        )
 
 
 def main():
     """Tether entry point."""
     try:
-        cameras = GPhoto2Driver.autodetect()
-        port = cameras[0][1] if len(cameras) == 1 else camera_select(cameras)
-        if not port:
-            print("No camera found or selected.")
-        else:
-            start_gui(Camera(GPhoto2Driver(port)))
-            Gtk.main()
+        set_application_theme()
+        camera_select()
+        Gtk.main()
     except Exception as ex:  # pylint: disable=broad-except
         msg = "Is the camera correctly attached and turned on?"
         print(f"{traceback.format_exc()}\n{ex}\n{msg}")
