@@ -20,7 +20,7 @@
 from gi.repository import Gtk
 
 
-class ListComboBox(Gtk.ComboBox):
+class ListComboBox(Gtk.ComboBox):  # pylint: disable=too-few-public-methods
     """Create a combo box control."""
 
     def __init__(self, datalist):

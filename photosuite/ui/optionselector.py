@@ -22,7 +22,7 @@ from gi.repository import Gtk
 from .functions import label_with_character_size  # pylint: disable=import-error
 
 
-class OptionSelector(Gtk.Box):
+class OptionSelector(Gtk.Box):  # pylint: disable=too-few-public-methods
     """A compose widget for setting camera values."""
 
     def __init__(self, title, datalist):

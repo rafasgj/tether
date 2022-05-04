@@ -21,7 +21,7 @@ from gi.repository import Gtk
 from .optionselector import OptionSelector  # pylint: disable=import-error
 
 
-class CameraControlBox(Gtk.Box):
+class CameraControlBox(Gtk.Box):  # pylint: disable=too-few-public-methods
     """Create box to control camera settings."""
 
     def __init__(self, camera, _cb=None):
