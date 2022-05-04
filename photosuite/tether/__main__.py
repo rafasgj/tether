@@ -144,7 +144,8 @@ def tether_window(_sender, camera):
     window = Gtk.Window()
     window.set_title("Tether")
     window.set_resizable(False)
-    width, height = get_screen_dimension()
+    # width, height = get_screen_dimension()
+    width, height = 0, 0
     window.move(width, height)
     window.connect("destroy", Gtk.main_quit)
     window.add(create_frame(camera))
