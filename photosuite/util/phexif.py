@@ -45,13 +45,11 @@ class ExifTool:
 
     def start(self):
         """Initialize the Exiftool application."""
-        # pylint: disable=unspecified-encoding
         with open(os.devnull, "w") as devnull:
             self._process = Popen(  # pylint: disable=consider-using-with
                 ExifTool.COMMAND, stdin=PIPE, stdout=PIPE, stderr=devnull
             )
             self._running = True
-        # pylint: enable=unspecified-encoding
 
     def terminate(self):
         """Terminate the running process if it is still running."""
@@ -94,9 +92,7 @@ class ExifTool:
         """Send a command to the running process."""
         if self._running:
             params = [i for subl in args for i in subl]
-            # pylint: disable=consider-using-f-string
             data = "%s\n" % "\n".join(params)
-            # pylint: enable=consider-using-f-string
             self._process.stdin.write(bytes(data.encode("utf-8")))
             self._process.stdin.flush()
 
