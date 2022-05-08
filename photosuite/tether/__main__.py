@@ -139,8 +139,9 @@ def set_application_theme():
     context.add_provider_for_screen(screen, css_provider, priority)
 
 
-def tether_window(_sender, camera):
+def tether_window(_sender, port):
     """Start graphical interface."""
+    camera = Camera(GPhoto2Driver(port[0]))
     window = Gtk.Window()
     window.set_title("Tether")
     window.set_resizable(False)
@@ -150,7 +151,7 @@ def tether_window(_sender, camera):
     window.connect("destroy", Gtk.main_quit)
     window.add(create_frame(camera))
     window.show_all()
-    window.set_keep_above(True)
+    window.set_keep_above(camera)
 
 
 def camera_select():
@@ -161,7 +162,7 @@ def camera_select():
         nonlocal selected, combo
         tree_iter = combo.get_active_iter()
         model = combo.get_model()
-        selected = model[tree_iter][1]
+        selected[0] = model[tree_iter][1]
         window.close()
 
     def update_combo(camdata):
@@ -183,15 +184,7 @@ def camera_select():
     def refresh(_):
         update_combo(GPhoto2Driver.autodetect())
 
-    combo = None
-    selected = None
-
-    camera_list = GPhoto2Driver.autodetect()
-    if len(camera_list) == 1:
-        selected = camera_list[0][1]
-        tether_window(None, Camera(GPhoto2Driver(selected)))
-    else:
-        update_combo(camera_list)
+    def __create_ui():
         window = Gtk.Window()
         window.set_title("Camera")
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
@@ -213,9 +206,19 @@ def camera_select():
         hbox.pack_start(brefresh, True, True, 5)
         vbox.pack_start(hbox, False, False, 5)
         window.show_all()
-        window.connect(
-            "destroy", tether_window, Camera(GPhoto2Driver(selected))
-        )
+        window.connect("destroy", tether_window, selected)
+        return window
+
+    combo = None
+    selected = [None]
+
+    camera_list = GPhoto2Driver.autodetect()
+    if len(camera_list) == 1:
+        print(camera_list[0][1])
+        tether_window(None, [camera_list[0][1]])
+    else:
+        update_combo(camera_list)
+        window = __create_ui()
 
 
 def main():
