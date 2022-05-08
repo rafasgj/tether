@@ -21,6 +21,7 @@ import io
 import gphoto2  # pylint: disable=import-error
 
 from photosuite.camera.cameradriver import CameraDriver
+from photosuite.camera.errors import CameraError
 
 
 class GPhoto2Error(Exception):
@@ -75,6 +76,8 @@ class GPhoto2Driver(CameraDriver):
                 error = str(gpex)
             raise GPhoto2Error(f"{error} (error code: {gpex.code})") from None
         else:
+            if not self.can_capture_image():
+                raise CameraError("Cannot capture images with this camera.")
             self.__config = self.__cam.get_config()
 
     def __invalidate_cam(self):
@@ -137,7 +140,7 @@ class GPhoto2Driver(CameraDriver):
                 gphoto2.GP_OPERATION_CAPTURE_IMAGE
                 | gphoto2.GP_OPERATION_CAPTURE_PREVIEW
             )
-            return abilities.operations & flags
+            return abilities.operations & flags != 0
         return False
 
     def __capture_from_camera(self):
