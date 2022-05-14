@@ -117,17 +117,24 @@ def picture_taken(fname):
     global last_image  # pylint: disable=invalid-name,global-statement
     pil = ("image/jpeg", "image/tiff", "image/gif", "image/png")
     mime_type = mime.from_file(fname)  # pylint: disable=no-member
-    metadata = exif.get_metadata(fname)[0]
-    key = "EXIF:Orientation"
-    rotation = [0, 0, 0, 180, 0, 0, -90, 0, 90]
-    orientation = rotation[int(metadata[key])] if key in metadata else 0
-    if mime_type in pil:
-        last_image = Image.open(fname)
-    else:
-        reader = io.BytesIO(exif.get_image_preview(fname))
-        last_image = Image.open(reader)
-    last_image = last_image.rotate(orientation, expand=True)
-    img_win.queue_draw()
+    if mime_type.startswith("image/"):
+        try:
+            metadata = exif.get_metadata(fname)[0]
+            key = "EXIF:Orientation"
+            rotation = [0, 0, 0, 180, 0, 0, -90, 0, 90]
+            orientation = rotation[int(metadata[key])] if key in metadata else 0
+            if mime_type in pil:
+                last_image = Image.open(fname)
+            else:
+                reader = io.BytesIO(exif.get_image_preview(fname))
+                last_image = Image.open(reader)
+            last_image = last_image.rotate(orientation, expand=True)
+            img_win.queue_draw()
+        except Exception as exception:  # pylint: disable=broad-except
+            print(
+                f"Failed to display image {fname} ({mime_type}).\n"
+                + f"Error: {str(exception)}"
+            )
 
 
 class FileThread(Thread):
@@ -151,7 +158,6 @@ class FileThread(Thread):
             if self.keep_running:
                 file, closed = queue.get()
                 if closed:
-                    print(f"Showing: {file}")
                     picture_taken(file)
                 queue.task_done()
 
